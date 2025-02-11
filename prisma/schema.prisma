@@ -7,12 +7,30 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+enum Role {
+    WORKER
+    EMPLOYER
+}
+
+enum GigStatus {
+    OPEN
+    IN_PROGRESS
+    COMPLETED
+}
+
+enum ApplicationStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
+}
+
 model Account {
     id                String  @id @default(cuid())
     userId            String
     type              String
     provider          String
     providerAccountId String
+    password          String?
     refresh_token     String?
     access_token      String?
     expires_at        Int?
@@ -38,13 +56,76 @@ model Session {
 
 model User {
     id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
+    name          String
+    email         String    @unique
     emailVerified DateTime?
     image         String?
+    role          Role      @default(WORKER)
 
-    accounts Account[]
-    sessions Session[]
+    // Hyper-location matching
+    latitude       Float?
+    longitude      Float?
+    jobPreferences String[] // List of preferred gig categories
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relationships
+    accounts        Account[]
+    sessions        Session[]
+    postedGigs      Gig[]         @relation("PostedGigs")
+    applications    Application[]
+    reviewsGiven    Review[]      @relation("ReviewsGiven")
+    reviewsReceived Review[]      @relation("ReviewsReceived")
+}
+
+model Gig {
+    id          String    @id @default(cuid())
+    title       String
+    description String
+    latitude    Float
+    longitude   Float
+    pay         Float
+    deadline    DateTime
+    status      GigStatus @default(OPEN)
+    category    String // Job category (e.g., "Delivery", "Programming", etc.)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relationships
+    employerId   String
+    employer     User          @relation("PostedGigs", fields: [employerId], references: [id])
+    applications Application[]
+    reviews      Review[]
+}
+
+model Application {
+    id        String            @id @default(cuid())
+    message   String?
+    status    ApplicationStatus @default(PENDING)
+    createdAt DateTime          @default(now())
+
+    // Relationships
+    workerId String
+    worker   User   @relation(fields: [workerId], references: [id])
+    gigId    String
+    gig      Gig    @relation(fields: [gigId], references: [id])
+}
+
+model Review {
+    id        String   @id @default(cuid())
+    rating    Int // Range 1 to 5
+    comment   String?
+    createdAt DateTime @default(now())
+
+    // Relationships
+    gigId          String
+    gig            Gig    @relation(fields: [gigId], references: [id])
+    reviewerId     String
+    reviewer       User   @relation("ReviewsGiven", fields: [reviewerId], references: [id])
+    reviewedUserId String
+    reviewedUser   User   @relation("ReviewsReceived", fields: [reviewedUserId], references: [id])
 }
 
 model VerificationToken {
