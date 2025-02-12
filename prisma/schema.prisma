@@ -45,10 +45,11 @@ model User {
     role          Role
 
     // Hyper-location matching
-    latitude       Float?
-    longitude      Float?
-    address        String?
-    jobPreferences String[] // List of preferred gig categories
+    latitude        Float?
+    longitude       Float?
+    address         String?
+    preferredRadius Float?
+    jobPreferences  String[] // List of preferred gig categories
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
