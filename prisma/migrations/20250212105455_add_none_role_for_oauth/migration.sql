@@ -1,0 +1,5 @@
+-- AlterEnum
+ALTER TYPE "Role" ADD VALUE 'NONE';
+
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "role" DROP DEFAULT;

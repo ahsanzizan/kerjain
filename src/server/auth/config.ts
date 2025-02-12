@@ -1,17 +1,12 @@
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 
 import { env } from "@/env";
 import { db } from "@/server/db";
-import {
-  jwtHelper,
-  tokenOneDay,
-  tokenOnWeek,
-  type AuthUser,
-} from "@/utils/jwtHelper";
 import { type Role } from "@prisma/client";
 import * as bcrypt from "bcryptjs";
+import { type DefaultJWT } from "next-auth/jwt";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -24,24 +19,26 @@ declare module "next-auth" {
     user: {
       id: string;
       role: Role;
+      name: string;
+      image: string;
+      email: string;
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   id?: string;
-  //   role: Role;
-  // }
+  interface User {
+    id?: string;
+    role: Role;
+  }
 }
 
 declare module "next-auth/jwt" {
   /** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
-  interface JWT {
-    user: AuthUser;
-    accessToken: string;
-    refreshToken: string;
-    accessTokenExpired: number;
-    refreshTokenExpired: number;
-    error?: "RefreshAccessTokenError";
+  interface JWT extends DefaultJWT {
+    id: string;
+    role: Role;
+    name: string;
+    image: string;
+    email: string;
   }
 }
 
@@ -55,7 +52,7 @@ export const authConfig = {
     strategy: "jwt",
   },
   secret: env.AUTH_SECRET,
-  pages: { signIn: "/auth/login" },
+  // pages: { signIn: "/auth/login" },
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -89,29 +86,30 @@ export const authConfig = {
             select: {
               id: true,
               name: true,
-              accounts: {
-                where: {
-                  provider: "credentials",
-                },
-                take: 1,
-              },
+              email: true,
+              image: true,
+              role: true,
+              account: true,
             },
           });
 
-          if (!user?.accounts[0]?.password) {
+          if (!user?.account?.password) {
             return null;
           }
 
           if (user && credentials) {
             const validPassword = await bcrypt.compare(
               password,
-              user.accounts[0].password,
+              user.account.password,
             );
 
             if (validPassword) {
               return {
                 id: user.id,
                 name: user.name,
+                role: user.role,
+                email: user.email,
+                image: user.image,
               };
             }
           }
@@ -121,93 +119,79 @@ export const authConfig = {
         return null;
       },
     }),
-    // GoogleProvider({
-    //   clientId: process.env.GOOGLE_CLIENT_ID,
-    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    //   allowDangerousEmailAccountLinking: false,
-    // }),
-  ],
-  adapter: PrismaAdapter(db),
-  callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
+    GoogleProvider({
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: false,
     }),
+  ],
+  callbacks: {
+    session({ session }) {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+        },
+      };
+    },
     async redirect({ url, baseUrl }) {
       return url.startsWith("/") ? new URL(url, baseUrl).toString() : url;
     },
     async signIn({ user }) {
       if (!user.email) return false;
 
-      // const existingUser = await db.user.findUnique({
-      //   where: { email: user.email },
-      // });
+      const existingUser = await db.user.findUnique({
+        where: { email: user.email },
+      });
 
-      // // If the user does not exist, then it's a Google sign-in
-      // if (!existingUser) {
-      //   try {
-      //     await db.user.create({
-      //       data: {
-      //         email: user.email,
-      //         name: user.name ?? user.email.split("@")[0],
-      //         role: "",
-      //         is_verified: true,
-      //       },
-      //     });
-      //   } catch (error) {
-      //     console.error("Error creating user:", error);
-      //     return false;
-      //   }
-      // }
+      // If the user does not exist, then it's a Google sign-in
+      if (!existingUser) {
+        try {
+          await db.user.create({
+            data: {
+              image:
+                "https://res.cloudinary.com/mokletorg/image/upload/v1710992405/user.svg",
+              email: user.email,
+              name: user.name ?? user.email.split("@")[0] ?? "Unnamed",
+              role: "NONE",
+              emailVerified: new Date(),
+              account: {
+                create: {
+                  provider: "Google",
+                },
+              },
+            },
+          });
+        } catch (error) {
+          console.error("Error creating user:", error);
+          return false;
+        }
+      }
 
       return true;
     },
     async jwt({ token, user }) {
       if (user) {
-        const authUser = { id: user.id, name: user.name } as AuthUser;
+        // On initial sign in, get all user data we need
+        const userdb = await db.user.findUnique({ where: { id: user.id } });
 
-        const accessToken = await jwtHelper.createAcessToken(authUser);
-        const refreshToken = await jwtHelper.createRefreshToken(authUser);
-        const accessTokenExpired = Date.now() / 1000 + tokenOneDay;
-        const refreshTokenExpired = Date.now() / 1000 + tokenOnWeek;
+        if (!userdb) return token;
 
-        return {
-          ...token,
-          accessToken,
-          refreshToken,
-          accessTokenExpired,
-          refreshTokenExpired,
-          user: authUser,
-        };
-      } else {
-        if (token) {
-          // In subsequent requests, check access token has expired, try to refresh it
-          if (Date.now() / 1000 > token.accessTokenExpired) {
-            const verifyToken = await jwtHelper.verifyToken(token.refreshToken);
+        // Update last login time during JWT creation
+        await db.user.update({
+          where: { id: user.id },
+          data: {
+            image: token.image ?? undefined,
+            account: { update: { last_login: new Date() } },
+          },
+        });
 
-            if (verifyToken) {
-              const user = await db.user.findUnique({
-                where: {
-                  email: token.user.email,
-                },
-              });
+        console.log(userdb);
 
-              if (user) {
-                const accessToken = await jwtHelper.createAcessToken(
-                  token.user,
-                );
-                const accessTokenExpired = Date.now() / 1000 + tokenOneDay;
-
-                return { ...token, accessToken, accessTokenExpired };
-              }
-            }
-
-            return { ...token, error: "RefreshAccessTokenError" };
-          }
-        }
+        token.id = userdb.id;
+        token.role = userdb.role;
+        token.email = userdb.email;
+        if (userdb.image) token.image = userdb.image;
       }
 
       return token;
