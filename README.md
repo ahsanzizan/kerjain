@@ -23,7 +23,7 @@ Create a `.env` file in the root directory and configure the following variables
 
 ```env
 DATABASE_URL="mysql://user:password@localhost:3306/dbname"
-NEXTAUTH_SECRET="your-secret-key"
+AUTH_SECRET="your-secret-key"
 NEXTAUTH_URL="http://localhost:3000"
 GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
