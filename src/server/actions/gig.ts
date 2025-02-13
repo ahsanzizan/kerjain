@@ -69,7 +69,10 @@ export const cancelGig = async (input: { gigId: string }) => {
     throw new Error("Only open gigs can be canceled");
   }
 
-  if (gig.applications.length !== 0)
+  if (
+    gig.applications.find((application) => application.status !== "PENDING") !==
+    undefined
+  )
     throw new Error("You cannot cancel a gig that already has applications.");
 
   const updatedGig = await db.gig.update({
