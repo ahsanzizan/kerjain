@@ -1,7 +1,9 @@
+"use server";
+
 import { z } from "zod";
-import { auth } from "../../auth";
-import { db } from "../../db";
-import { validateActionInput } from "../../utils/validateActionInput";
+import { auth } from "../auth";
+import { db } from "../db";
+import { validateActionInput } from "../utils/validate-action-input";
 
 export async function updateUserProfile(input: {
   name?: string;
