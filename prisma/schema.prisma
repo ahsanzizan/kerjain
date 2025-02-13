@@ -17,6 +17,7 @@ enum GigStatus {
     OPEN
     IN_PROGRESS
     COMPLETED
+    CANCELED
 }
 
 enum ApplicationStatus {
