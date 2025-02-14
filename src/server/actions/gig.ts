@@ -25,7 +25,7 @@ export const evaluateGigPay = async (input: {
   const { category, pay } = input;
 
   const similarGigs = await db.gig.findMany({
-    where: { category, status: "OPEN" },
+    where: { category },
     select: { pay: true },
   });
 
