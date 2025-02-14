@@ -8,7 +8,7 @@ import { validateActionInput } from "../utils/validate-action-input";
 
 export const acceptApplication = async (input: { applicationId: string }) => {
   try {
-    validateActionInput(
+    const { applicationId } = validateActionInput<{ applicationId: string }>(
       input,
       z.object({
         applicationId: z.string().uuid(),
@@ -18,7 +18,7 @@ export const acceptApplication = async (input: { applicationId: string }) => {
     const user = await requireRole("EMPLOYER");
 
     const application = await db.application.findUnique({
-      where: { id: input.applicationId },
+      where: { id: applicationId },
       include: { gig: true },
     });
 
@@ -28,11 +28,11 @@ export const acceptApplication = async (input: { applicationId: string }) => {
 
     await db.$transaction([
       db.application.update({
-        where: { id: input.applicationId },
+        where: { id: applicationId },
         data: { status: "ACCEPTED" },
       }),
       db.application.updateMany({
-        where: { gigId: application.gigId, id: { not: input.applicationId } },
+        where: { gigId: application.gigId, id: { not: applicationId } },
         data: { status: "REJECTED" },
       }),
       db.gig.update({
@@ -53,7 +53,10 @@ export const applyForGig = async (input: {
   message?: string;
 }) => {
   try {
-    validateActionInput(
+    const { gigId, message } = validateActionInput<{
+      gigId: string;
+      message?: string;
+    }>(
       input,
       z.object({
         gigId: z.string().uuid(),
@@ -61,7 +64,7 @@ export const applyForGig = async (input: {
       }),
     );
 
-    const gig = await db.gig.findUnique({ where: { id: input.gigId } });
+    const gig = await db.gig.findUnique({ where: { id: gigId } });
 
     if (!gig) return errorResponse("Gig not found.");
 
@@ -72,9 +75,9 @@ export const applyForGig = async (input: {
 
     const application = await db.application.create({
       data: {
-        gigId: input.gigId,
+        gigId,
         workerId: user.id,
-        message: input.message,
+        message,
       },
     });
 

@@ -3,6 +3,7 @@ import { Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { errorResponse, successResponse } from "../utils/action-response";
+import { validateActionInput } from "../utils/validate-action-input";
 
 const registerSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -10,6 +11,8 @@ const registerSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
   role: z.nativeEnum(Role),
 });
+
+type RegisterInput = z.infer<typeof registerSchema>;
 
 /**
  * Registers a new user.
@@ -23,8 +26,10 @@ export const registerUser = async (input: {
   role: Role;
 }) => {
   try {
-    const validatedData = registerSchema.parse(input);
-    const { name, email, password, role } = validatedData;
+    const { name, email, password, role } = validateActionInput<RegisterInput>(
+      input,
+      registerSchema,
+    );
 
     // Check if email is already in use
     const existingUser = await db.user.findUnique({ where: { email } });

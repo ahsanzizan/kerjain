@@ -6,15 +6,17 @@ import { db } from "../db";
 import { errorResponse, successResponse } from "../utils/action-response";
 import { validateActionInput } from "../utils/validate-action-input";
 
-export async function updateUserProfile(input: {
+type UpdateUserProfileInput = {
   name?: string;
   image?: string;
   address?: string;
   preferredRadius?: number;
   jobPreferences?: string[];
-}) {
+};
+
+export async function updateUserProfile(input: UpdateUserProfileInput) {
   try {
-    validateActionInput(
+    validateActionInput<UpdateUserProfileInput>(
       input,
       z.object({
         name: z.string().optional(),
