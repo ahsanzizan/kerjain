@@ -34,11 +34,13 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   /** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
   interface JWT extends DefaultJWT {
-    id: string;
-    role: Role;
-    name: string;
-    image: string;
-    email: string;
+    user: {
+      id: string;
+      role: Role;
+      name: string;
+      image: string;
+      email: string;
+    };
   }
 }
 
@@ -186,12 +188,17 @@ export const authConfig = {
           },
         });
 
-        console.log(userdb);
+        const { id, role, name, email, image } = userdb;
 
-        token.id = userdb.id;
-        token.role = userdb.role;
-        token.email = userdb.email;
-        if (userdb.image) token.image = userdb.image;
+        token.user = {
+          id,
+          name,
+          role,
+          email,
+          image:
+            image ??
+            "https://res.cloudinary.com/mokletorg/image/upload/v1710992405/user.svg",
+        };
       }
 
       return token;
