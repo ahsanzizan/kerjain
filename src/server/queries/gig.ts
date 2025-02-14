@@ -174,3 +174,30 @@ export const getPaginatedGigs = async (input: {
     throw error;
   }
 };
+
+export const evaluateGigPay = async (input: {
+  category: string;
+  pay: number;
+}) => {
+  const { category, pay } = input;
+
+  const similarGigs = await db.gig.findMany({
+    where: { category },
+    select: { pay: true },
+  });
+
+  if (similarGigs.length < 2) return "No data available";
+
+  // Extract pay values
+  const payValues = similarGigs.map((gig) => gig.pay).sort((a, b) => a - b);
+
+  const mid = Math.floor(payValues.length / 2);
+  const medianPay =
+    payValues.length % 2 === 0
+      ? (payValues[mid - 1]! + payValues[mid]!) / 2
+      : payValues[mid]!;
+
+  if (pay < medianPay * 0.8) return "Low"; // Less than 80% of median
+  if (pay > medianPay * 1.2) return "Generous"; // More than 120% of median
+  return "Fair"; // Within the 80%-120% range
+};

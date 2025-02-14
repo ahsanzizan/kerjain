@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { auth } from "../auth";
 import { db } from "../db";
+import { errorResponse, successResponse } from "../utils/action-response";
 import { validateActionInput } from "../utils/validate-action-input";
 
 export async function updateUserProfile(input: {
@@ -12,24 +13,36 @@ export async function updateUserProfile(input: {
   preferredRadius?: number;
   jobPreferences?: string[];
 }) {
-  validateActionInput(
-    input,
-    z.object({
-      name: z.string().optional(),
-      image: z.string().url().optional(),
-      address: z.string().optional(),
-      preferredRadius: z.number().min(1).max(100).optional(),
-      jobPreferences: z.array(z.string()).optional(),
-    }),
-  );
+  try {
+    validateActionInput(
+      input,
+      z.object({
+        name: z.string().optional(),
+        image: z.string().url().optional(),
+        address: z.string().optional(),
+        preferredRadius: z.number().min(1).max(100).optional(),
+        jobPreferences: z.array(z.string()).optional(),
+      }),
+    );
 
-  const session = await auth();
-  if (!session) throw new Error("Unauthorized");
+    const session = await auth();
+    if (!session) return errorResponse("Unauthorized");
 
-  return db.user.update({
-    where: { id: session.user.id },
-    data: {
-      ...input,
-    },
-  });
+    const updatedUser = await db.user.update({
+      where: { id: session.user.id },
+      data: {
+        ...input,
+      },
+    });
+
+    return successResponse(
+      {
+        user: updatedUser,
+      },
+      "Profile updated successfully",
+    );
+  } catch (error) {
+    console.error(error);
+    return errorResponse("Failed to update profile");
+  }
 }

@@ -2,6 +2,7 @@ import { db } from "@/server/db";
 import { Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { errorResponse, successResponse } from "../utils/action-response";
 
 const registerSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -21,35 +22,40 @@ export const registerUser = async (input: {
   password: string;
   role: Role;
 }) => {
-  // Validate input
-  const validatedData = registerSchema.parse(input);
-  const { name, email, password, role } = validatedData;
+  try {
+    const validatedData = registerSchema.parse(input);
+    const { name, email, password, role } = validatedData;
 
-  // Check if email is already in use
-  const existingUser = await db.user.findUnique({ where: { email } });
-  if (existingUser) {
-    throw new Error("Email is already in use");
-  }
+    // Check if email is already in use
+    const existingUser = await db.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return errorResponse("Email is already in use");
+    }
 
-  // Hash password before storing in the database
-  const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  // Create new user
-  const newUser = await db.user.create({
-    data: {
-      name,
-      email,
-      role,
-      account: {
-        create: { provider: "Credentials", password: hashedPassword },
+    const newUser = await db.user.create({
+      data: {
+        name,
+        email,
+        role,
+        account: {
+          create: { provider: "Credentials", password: hashedPassword },
+        },
       },
-    },
-  });
+    });
 
-  return {
-    id: newUser.id,
-    name: newUser.name,
-    email: newUser.email,
-    createdAt: newUser.createdAt,
-  };
+    return successResponse(
+      {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        createdAt: newUser.createdAt,
+      },
+      "Successfully registered user",
+    );
+  } catch (error) {
+    console.error(error);
+    return errorResponse("Failed to register user");
+  }
 };
