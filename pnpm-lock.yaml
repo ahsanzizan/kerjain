@@ -11,6 +11,9 @@ importers:
       '@auth/prisma-adapter':
         specifier: ^2.7.2
         version: 2.7.4(@prisma/client@5.22.0(prisma@5.22.0))
+      '@bprogress/next':
+        specifier: ^3.0.6
+        version: 3.0.6(next@15.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@hookform/resolvers':
         specifier: ^4.1.1
         version: 4.1.1(react-hook-form@7.54.2(react@18.3.1))
@@ -47,9 +50,6 @@ importers:
       next-auth:
         specifier: 5.0.0-beta.25
         version: 5.0.0-beta.25(next@15.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
-      next-nprogress-bar:
-        specifier: ^2.4.7
-        version: 2.4.7
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -159,6 +159,22 @@ packages:
     resolution: {integrity: sha512-3T/X94R9J1sxOLQtsD3ijIZ0JGHPXlZQxRr/8NpnZBJ3KGxun/mNsZ1MwMRhTxy0mmn9JWXk7u9+xCcVn0pu3A==}
     peerDependencies:
       '@prisma/client': '>=2.26.0 || >=3 || >=4 || >=5'
+
+  '@bprogress/core@1.1.15':
+    resolution: {integrity: sha512-s5O7RjLwD8YXa8tUCQhm/VIc/yTifAlCiOBX2ejCM3e+HSAiEXEvYiEgslSdnSjw/wKl3myLzvO+DLHuBzO+IQ==}
+
+  '@bprogress/next@3.0.6':
+    resolution: {integrity: sha512-AQL35H6WSmxy7LPwtBF6sw1iX430K7BonQutZhuwXEwI7eMFRwN/YrHB0uMg8q1lUyhKbwnk2D2crPzH4RcPYw==}
+    peerDependencies:
+      next: '>=13.0.0'
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
+
+  '@bprogress/react@1.1.1':
+    resolution: {integrity: sha512-1ovpqW0ZTXOZ6NdnM3MRH5wQb/47RXBN6nEVGa72O2k4Tvr5x8htuOqH1eXaAbEeVh+DtpK3Hj3xT/FA8DsjJg==}
+    peerDependencies:
+      react: '>=18.0.0'
+      react-dom: '>=18.0.0'
 
   '@emnapi/runtime@1.3.1':
     resolution: {integrity: sha512-kEBmG8KyqtxJZv+ygbEim+KCGtIq1fC22Ms3S4ziXmYKm8uyoLX0MHONVKwp+9opg390VaKRNt4a7A9NwmpNhw==}
@@ -1464,9 +1480,6 @@ packages:
       nodemailer:
         optional: true
 
-  next-nprogress-bar@2.4.7:
-    resolution: {integrity: sha512-OeveNQYFBhQhZ+RgrDnvHNUEQfHCmipymmD4AfAVE9pFV4jeWi7/nNK5f0lIk7ODRrtjyyr/n2YpkRbs5kUoMg==}
-
   next@15.1.6:
     resolution: {integrity: sha512-Hch4wzbaX0vKQtalpXvUiw5sYivBy4cm5rzUKrBnUB/y436LGrvOUqYvlSeNVCWFO/770gDlltR9gqZH62ct4Q==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
@@ -1491,9 +1504,6 @@ packages:
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
     engines: {node: '>=0.10.0'}
-
-  nprogress-v2@1.1.10:
-    resolution: {integrity: sha512-MypWLNIPIM07SS0bAc/oac0vhVFz9vAHm7d1sj//Pnf3J03LQ3CuWrlDteIu6exq0fIvkDJ6tUDRWLaifsIt5w==}
 
   oauth4webapi@3.1.4:
     resolution: {integrity: sha512-eVfN3nZNbok2s/ROifO0UAc5G8nRoLSbrcKJ09OqmucgnhXEfdIQOR4gq1eJH1rN3gV7rNw62bDEgftsgFtBEg==}
@@ -2129,6 +2139,22 @@ snapshots:
       - '@simplewebauthn/browser'
       - '@simplewebauthn/server'
       - nodemailer
+
+  '@bprogress/core@1.1.15': {}
+
+  '@bprogress/next@3.0.6(next@15.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@bprogress/core': 1.1.15
+      '@bprogress/react': 1.1.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 15.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
+  '@bprogress/react@1.1.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@bprogress/core': 1.1.15
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   '@emnapi/runtime@1.3.1':
     dependencies:
@@ -3557,10 +3583,6 @@ snapshots:
       next: 15.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
 
-  next-nprogress-bar@2.4.7:
-    dependencies:
-      nprogress-v2: 1.1.10
-
   next@15.1.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@next/env': 15.1.6
@@ -3587,8 +3609,6 @@ snapshots:
       - babel-plugin-macros
 
   normalize-path@3.0.0: {}
-
-  nprogress-v2@1.1.10: {}
 
   oauth4webapi@3.1.4: {}
 

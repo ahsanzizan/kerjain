@@ -1,7 +1,10 @@
+import { ProgressBarProvider } from "@/components/providers/progress-bar.provider";
+import { NextAuthSessionProvider } from "@/components/providers/session.provider";
 import "@/styles/globals.css";
 
 import { type Metadata } from "next";
 import { DM_Sans } from "next/font/google";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Kerjain! - Satu Platform, Ribuan Peluang!",
@@ -36,7 +39,13 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${dmSans.className}`}>
-      <body className="bg-background-200">{children}</body>
+      <NextAuthSessionProvider>
+        <body className="overflow-x-hidden bg-background-200 antialiased">
+          <ProgressBarProvider />
+          {children}
+          <Toaster />
+        </body>
+      </NextAuthSessionProvider>
     </html>
   );
 }
