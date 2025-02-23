@@ -4,7 +4,7 @@ import { type Metadata } from "next";
 import { DM_Sans } from "next/font/google";
 
 export const metadata: Metadata = {
-  title: "Kerjain!",
+  title: "Kerjain! - Satu Platform, Ribuan Peluang!",
   description: "Kerjain! is an innovative gig working solution by Team Namesa.",
   authors: [
     { name: "Ahsan Azizan", url: "https://ahsanzizan.xyz" },

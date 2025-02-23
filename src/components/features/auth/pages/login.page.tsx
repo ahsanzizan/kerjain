@@ -2,14 +2,14 @@ import { Text } from "@/components/common/text";
 import { PageContainer } from "@/components/layout/page-container";
 import Image from "next/image";
 import { Carousel } from "../components/carousel";
-import { Button } from "@/components/ui/button";
+import { LoginForm } from "../components/forms/login.form";
 
 export const LoginPage = () => {
   return (
     <PageContainer>
-      <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-2 [&>section]:px-5 [&>section]:py-20">
+      <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-2 [&>section]:px-14 [&>section]:py-20">
         <section id="login-form" className="w-full">
-          <div className="mb-16">
+          <div className="mb-[3.75rem]">
             <Text variant="title1-bold" className="text-primary-500 mb-1">
               Selamat Datang di Kerjain!
             </Text>
@@ -18,9 +18,7 @@ export const LoginPage = () => {
               sekitar Anda!
             </Text>
           </div>
-          <Button variant={"secondary"} className="w-full">
-            Masuk dengan Google
-          </Button>
+          <LoginForm />
         </section>
         <section
           id="guides"
