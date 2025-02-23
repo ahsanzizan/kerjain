@@ -2,6 +2,7 @@
 
 import { Text } from "@/components/common/text";
 import { cn } from "@/lib/utils";
+import { motion } from "motion/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -48,26 +49,36 @@ export const Carousel = () => {
   }, [isManual]);
 
   return (
-    <div className="mt-20 flex w-full flex-col">
-      <Image
-        src={`/illustrations/login/${step + 1}.png`}
-        width={620}
-        height={620}
-        className="mb-14 h-[27rem] w-full self-center object-contain"
-        alt="Ilustrasi"
-      />
-      <Text variant="title3" className="text-text-200 mb-5">
-        {CAROUSEL_CONTENTS[step]?.title}
-      </Text>
-      <Text variant="body" className="text-text-200 mb-10 text-opacity-90">
-        {CAROUSEL_CONTENTS[step]?.description}
-      </Text>
+    <div className="mt-20 flex w-full flex-col overflow-hidden">
+      <motion.div
+        key={step} // Forces re-render and re-animation
+        initial={{ opacity: 0, x: 50 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -50 }}
+        transition={{ duration: 0.6, ease: "easeInOut" }}
+        className="flex flex-col"
+      >
+        <Image
+          src={`/illustrations/login/${step + 1}.png`}
+          width={620}
+          height={620}
+          className="mb-14 h-[27rem] w-full self-center object-contain"
+          alt="Ilustrasi"
+        />
+        <Text variant="title3" className="text-text-200 mb-5">
+          {CAROUSEL_CONTENTS[step]?.title}
+        </Text>
+        <Text variant="body" className="text-text-200 mb-10 text-opacity-90">
+          {CAROUSEL_CONTENTS[step]?.description}
+        </Text>
+      </motion.div>
+
       <div className="grid w-full grid-cols-3 gap-x-5">
-        {Array.from({ length: CAROUSEL_CONTENTS.length }).map((_, index) => (
+        {CAROUSEL_CONTENTS.map((_, index) => (
           <button
             key={index}
             className={cn(
-              `h-2 min-w-full rounded-full transition-all duration-300`,
+              "h-2 min-w-full rounded-full transition-all duration-300",
               step === index ? "bg-white" : "bg-white/50",
             )}
             onClick={() => {

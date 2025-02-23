@@ -2,6 +2,7 @@ import { Text } from "@/components/common/text";
 import { PageContainer } from "@/components/layout/page-container";
 import Image from "next/image";
 import { Carousel } from "../components/carousel";
+import { Button } from "@/components/ui/button";
 
 export const LoginPage = () => {
   return (
@@ -17,6 +18,9 @@ export const LoginPage = () => {
               sekitar Anda!
             </Text>
           </div>
+          <Button variant={"secondary"} className="w-full">
+            Masuk dengan Google
+          </Button>
         </section>
         <section
           id="guides"
