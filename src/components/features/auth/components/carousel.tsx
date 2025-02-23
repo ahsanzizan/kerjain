@@ -1,0 +1,82 @@
+"use client";
+
+import { Text } from "@/components/common/text";
+import { cn } from "@/lib/utils";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+
+// Change delay in MS
+const CHANGE_DELAY = 5_000;
+
+type CarouselContent = {
+  title: string;
+  description: string;
+};
+
+const CAROUSEL_CONTENTS = [
+  {
+    title: "Solusi Tepat buat Pekerja dan Pencari Jasa Cepat",
+    description:
+      "Platform yang menghubungkan pekerja dan pencari jasa dalam satu tempat. Temukan peluang atau tenaga kerja terbaik dengan mudah!",
+  },
+  {
+    title: "Jelajahi Peluang Tak Terbatas",
+    description:
+      "Akses berbagai peluang kerja fleksibel atau temukan tenaga kerja andal untuk kebutuhan Anda, semuanya dalam satu platform.",
+  },
+  {
+    title: "Kalau ada yang bisa, Kenapa Enggak?",
+    description:
+      "Dapatkan penghasilan tambahan atau cari tenaga kerja berkualitas dengan cepat dan transparan melalui Kerjain!",
+  },
+] satisfies CarouselContent[];
+
+export const Carousel = () => {
+  const [step, setStep] = useState(0);
+  const [isManual, setIsManual] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!isManual) {
+        setStep((prevStep) =>
+          prevStep < CAROUSEL_CONTENTS.length - 1 ? prevStep + 1 : 0,
+        );
+      }
+    }, CHANGE_DELAY);
+
+    return () => clearInterval(interval);
+  }, [isManual]);
+
+  return (
+    <div className="mt-20 flex w-full flex-col">
+      <Image
+        src={`/illustrations/login/${step + 1}.png`}
+        width={620}
+        height={620}
+        className="mb-14 h-[27rem] w-full self-center object-contain"
+        alt="Ilustrasi"
+      />
+      <Text variant="title3" className="text-text-200 mb-5">
+        {CAROUSEL_CONTENTS[step]?.title}
+      </Text>
+      <Text variant="body" className="text-text-200 mb-10 text-opacity-90">
+        {CAROUSEL_CONTENTS[step]?.description}
+      </Text>
+      <div className="grid w-full grid-cols-3 gap-x-5">
+        {Array.from({ length: CAROUSEL_CONTENTS.length }).map((_, index) => (
+          <button
+            key={index}
+            className={cn(
+              `h-2 min-w-full rounded-full transition-all duration-300`,
+              step === index ? "bg-white" : "bg-white/50",
+            )}
+            onClick={() => {
+              setStep(index);
+              setIsManual(true);
+            }}
+          ></button>
+        ))}
+      </div>
+    </div>
+  );
+};

@@ -5,7 +5,7 @@ import { DM_Sans } from "next/font/google";
 
 export const metadata: Metadata = {
   title: "Kerjain!",
-  description: "Kerjain! is an innovative gig working solution.",
+  description: "Kerjain! is an innovative gig working solution by Team Namesa.",
   authors: [
     { name: "Ahsan Azizan", url: "https://ahsanzizan.xyz" },
     { name: "Amelia Cahyani", url: "https://instagram.com/amelizyn" },
@@ -36,7 +36,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${dmSans.className}`}>
-      <body>{children}</body>
+      <body className="bg-background-200">{children}</body>
     </html>
   );
 }
