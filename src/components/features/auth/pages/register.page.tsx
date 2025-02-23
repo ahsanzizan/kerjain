@@ -1,20 +1,20 @@
 import { Text } from "@/components/common/text";
 import { Suspense } from "react";
-import { LoginForm } from "../components/forms/login.form";
+import { RegisterForm } from "../components/forms/register.form";
 
-export const LoginPage = () => {
+export const RegisterPage = () => {
   return (
     <Suspense>
       <div className="mb-[3.75rem]">
         <Text variant="title1-bold" className="mb-1 text-primary-500">
-          Selamat Datang Kembali di Kerjain!
+          Selamat Datang di Kerjain!
         </Text>
         <Text variant="body" className="text-text-400">
           Cari pekerjaan fleksibel atau temukan tenaga kerja andal di sekitar
-          Anda!
+          Anda! Daftar untuk mulai menggunakan Kerjain.
         </Text>
       </div>
-      <LoginForm />
+      <RegisterForm />
     </Suspense>
   );
 };

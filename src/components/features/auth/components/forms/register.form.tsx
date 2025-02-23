@@ -2,9 +2,8 @@
 
 import { Text } from "@/components/common/text";
 import { buttonVariants } from "@/components/ui/button";
-import { checkVerifiedStatus } from "@/server/actions/user";
-import { signIn } from "next-auth/react";
 import { useRouter } from "@bprogress/next";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -12,36 +11,26 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { AuthForm } from "../../layout/auth.form";
 
-const loginSchema = z.object({
+const registerSchema = z.object({
+  name: z.string().min(1, "Nama tidak bisa kosong!"),
   email: z.string().email("Email tidak valid!"),
   password: z.string().min(1, "Password tidak bisa kosong!"),
 });
 
-export const LoginForm = () => {
+export const RegisterForm = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const onSubmit = async (values: { email: string; password: string }) => {
+  const onSubmit = async (values: {
+    name: string;
+    email: string;
+    password: string;
+  }) => {
     setLoading(true);
     const loadingToast = toast.loading("Loading...");
 
-    const verificationStatus = await checkVerifiedStatus({
-      email: values.email,
-    });
-    if (!verificationStatus.success) {
-      setLoading(false);
-      toast.error(verificationStatus.message, { id: loadingToast });
-      return;
-    }
-    if (!verificationStatus.data) {
-      setLoading(false);
-      toast.error("Verifikasi email anda terlebih dahulu", {
-        id: loadingToast,
-      });
-      return;
-    }
-
+    // TODO: Register the user, send email verification
     const loginResult = await signIn("credentials", {
       redirect: false,
       callbackUrl: "/",
@@ -51,12 +40,12 @@ export const LoginForm = () => {
 
     if (loginResult?.error) {
       setLoading(false);
-      toast.error(
-        loginResult.error === "CredentialsSignin"
-          ? "Email/password anda salah!"
-          : "Terjadi kesalahan",
-        { id: loadingToast },
-      );
+      // toast.error(
+      //   loginResult.error === "CredentialsSignin"
+      //     ? "Email/password anda salah!"
+      //     : "Terjadi kesalahan",
+      //   { id: loadingToast },
+      // );
       return;
     }
 
@@ -68,10 +57,15 @@ export const LoginForm = () => {
   return (
     <>
       <AuthForm
-        schema={loginSchema}
-        defaultValues={{ email: "", password: "" }}
+        schema={registerSchema}
+        defaultValues={{ name: "", email: "", password: "" }}
         onSubmit={onSubmit}
         fields={[
+          {
+            name: "name",
+            label: "Nama",
+            placeholder: "Masukkan nama",
+          },
           {
             name: "email",
             label: "Email",
@@ -88,12 +82,12 @@ export const LoginForm = () => {
         loading={loading}
       />
       <Text className="mt-12 text-center text-text-300">
-        Belum punya akun?{" "}
+        Sudah punya akun?{" "}
         <Link
-          href="/auth/register"
+          href="/auth/login"
           className={buttonVariants({ variant: "link", size: "link" })}
         >
-          Buat Akun
+          Masuk
         </Link>
       </Text>
       <Text variant="callout" className="mt-28 text-center text-text-300">
