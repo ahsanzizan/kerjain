@@ -1,3 +1,5 @@
+"use server";
+
 import { db } from "@/server/db";
 import { Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
@@ -62,5 +64,21 @@ export const registerUser = async (input: {
   } catch (error) {
     console.error(error);
     return errorResponse("Failed to register user");
+  }
+};
+
+export const checkVerifiedStatus = async (input: { email: string }) => {
+  const { email } = input;
+
+  try {
+    const user = await db.user.findUnique({ where: { email } });
+    if (!user) return errorResponse("User not found");
+
+    if (!user.emailVerified) return successResponse(false);
+
+    return successResponse(true);
+  } catch (error) {
+    console.error(error);
+    return errorResponse("Failed to check user verification status");
   }
 };
