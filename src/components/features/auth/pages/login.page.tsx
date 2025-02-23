@@ -1,9 +1,10 @@
 import { Text } from "@/components/common/text";
+import { Suspense } from "react";
 import { LoginForm } from "../components/forms/login.form";
 
 export const LoginPage = () => {
   return (
-    <>
+    <Suspense>
       <div className="mb-[3.75rem]">
         <Text variant="title1-bold" className="mb-1 text-primary-500">
           Selamat Datang di Kerjain!
@@ -14,6 +15,6 @@ export const LoginPage = () => {
         </Text>
       </div>
       <LoginForm />
-    </>
+    </Suspense>
   );
 };
