@@ -3,8 +3,8 @@
 import { Text } from "@/components/common/text";
 import { buttonVariants } from "@/components/ui/button";
 import { checkVerifiedStatus } from "@/server/actions/user";
-import { signIn } from "next-auth/react";
 import { useRouter } from "@bprogress/next";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -26,15 +26,17 @@ export const LoginForm = () => {
     setLoading(true);
     const loadingToast = toast.loading("Loading...");
 
-    const verificationStatus = await checkVerifiedStatus({
+    const verificationStatusResult = await checkVerifiedStatus({
       email: values.email,
+      password: values.password,
     });
-    if (!verificationStatus.success) {
+
+    if (!verificationStatusResult.success) {
       setLoading(false);
-      toast.error(verificationStatus.message, { id: loadingToast });
+      toast.error(verificationStatusResult.message, { id: loadingToast });
       return;
     }
-    if (!verificationStatus.data) {
+    if (verificationStatusResult.data === false) {
       setLoading(false);
       toast.error("Verifikasi email anda terlebih dahulu", {
         id: loadingToast,

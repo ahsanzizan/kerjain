@@ -70,18 +70,33 @@ export const registerUser = async (input: {
   }
 };
 
-export const checkVerifiedStatus = async (input: { email: string }) => {
-  const { email } = input;
+export const checkVerifiedStatus = async (input: {
+  email: string;
+  password: string;
+}) => {
+  const { email, password } = input;
 
   try {
-    const user = await db.user.findUnique({ where: { email } });
-    if (!user) return errorResponse("User not found");
+    const user = await db.user.findUnique({
+      where: { email },
+      include: { account: true },
+    });
+    if (!user || !user.account)
+      return errorResponse("Email/password anda salah!");
 
-    if (!user.emailVerified) return successResponse(false);
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      user.account.password!,
+    );
+
+    if (!user.emailVerified && !isPasswordCorrect)
+      return errorResponse("Email/password anda salah!");
+
+    if (!user.emailVerified && isPasswordCorrect) return successResponse(false);
 
     return successResponse(true);
   } catch (error) {
     console.error(error);
-    return errorResponse("Failed to check user verification status");
+    return errorResponse("Terjadi kesalahan.");
   }
 };
