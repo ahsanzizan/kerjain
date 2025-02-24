@@ -1,4 +1,4 @@
-export type ApiResponse<T = null> = {
+export type ActionResponse<T = null> = {
   success: boolean;
   data?: T;
   message?: string;
@@ -7,13 +7,13 @@ export type ApiResponse<T = null> = {
 export const successResponse = <T>(
   data: T,
   message = "Success",
-): ApiResponse<T> => ({
+): ActionResponse<T> => ({
   success: true,
   data,
   message,
 });
 
-export const errorResponse = (message: string): ApiResponse => ({
+export const errorResponse = (message: string): ActionResponse => ({
   success: false,
   message,
 });

@@ -2,10 +2,9 @@
 
 import { Text } from "@/components/common/text";
 import { buttonVariants } from "@/components/ui/button";
+import { registerUser } from "@/server/actions/user";
 import { useRouter } from "@bprogress/next";
-import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -20,7 +19,6 @@ const registerSchema = z.object({
 export const RegisterForm = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const onSubmit = async (values: {
     name: string;
@@ -30,28 +28,21 @@ export const RegisterForm = () => {
     setLoading(true);
     const loadingToast = toast.loading("Loading...");
 
-    // TODO: Register the user, send email verification
-    const loginResult = await signIn("credentials", {
-      redirect: false,
-      callbackUrl: "/",
+    const registerResult = await registerUser({
+      name: values.name,
       email: values.email,
       password: values.password,
     });
 
-    if (loginResult?.error) {
+    if (!registerResult.success) {
       setLoading(false);
-      // toast.error(
-      //   loginResult.error === "CredentialsSignin"
-      //     ? "Email/password anda salah!"
-      //     : "Terjadi kesalahan",
-      //   { id: loadingToast },
-      // );
+      toast.error(registerResult.message, { id: loadingToast });
       return;
     }
 
-    toast.success("Berhasil Masuk!", { id: loadingToast });
+    toast.success("Berhasil Mendaftar!", { id: loadingToast });
     setLoading(false);
-    router.push(searchParams.get("callbackUrl") ?? "/");
+    router.push(`/auth/verify-email?email=${values.email}`);
   };
 
   return (
@@ -78,7 +69,7 @@ export const RegisterForm = () => {
             type: "password",
           },
         ]}
-        submitLabel="Masuk"
+        submitLabel="Daftar"
         loading={loading}
       />
       <Text className="mt-12 text-center text-text-300">
