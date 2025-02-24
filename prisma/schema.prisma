@@ -32,9 +32,21 @@ model Account {
     password   String?
     last_login DateTime?
 
-    user                     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId                   String @unique
+    user                     User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId                   String                    @unique
     refresh_token_expires_in Int?
+    token                    AccountVerificationToken?
+}
+
+model AccountVerificationToken {
+    token       String   @unique
+    sent        DateTime @default(now())
+    expiry_date DateTime
+
+    account   Account @relation(fields: [accountId], references: [id])
+    accountId String  @unique
+
+    @@unique([accountId, token])
 }
 
 model User {
@@ -43,7 +55,7 @@ model User {
     email         String    @unique
     emailVerified DateTime?
     image         String?
-    role          Role
+    role          Role      @default(NONE)
 
     // Hyper-location matching
     latitude        Float?
