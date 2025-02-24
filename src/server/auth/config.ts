@@ -54,7 +54,7 @@ export const authConfig = {
     strategy: "jwt",
   },
   secret: env.AUTH_SECRET,
-  // pages: { signIn: "/auth/login" },
+  pages: { signIn: "/auth/login" },
   providers: [
     CredentialsProvider({
       name: "Credentials",
