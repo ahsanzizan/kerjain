@@ -1,14 +1,10 @@
 "use client";
 
 import { buttonVariants } from "@/components/ui/button";
+import { type NavItem } from "@/types/nav-item";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRef } from "react";
-
-interface NavItem {
-  title: string;
-  href: string;
-}
 
 const NAV_ITEMS = [
   { title: "Beranda", href: "/" },
@@ -21,13 +17,11 @@ export const Navbar = () => {
   const { data: session, status } = useSession();
   const navbarToggle = useRef<HTMLInputElement>(null);
 
-  console.log(session);
-
   return (
     <>
       <nav className="fixed z-[1000] w-full bg-background-200">
-        <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between px-6 py-4 md:px-12">
-          <Link href={"/"} className="max-w-[100.37px]">
+        <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between px-6 py-4">
+          <Link href={"/"} className="w-fit">
             <span className="block aspect-[16/5] w-32 bg-[url(/logo.png)] bg-contain bg-no-repeat text-transparent">
               Kerjain
             </span>
@@ -168,7 +162,7 @@ export const Navbar = () => {
               </Link>
             )}
             {status === "unauthenticated" && (
-              <div className="ml-6 flex items-center gap-x-2">
+              <div className="ml-6 flex flex-col items-center gap-x-2">
                 <Link
                   href={"/auth/login"}
                   className={buttonVariants({

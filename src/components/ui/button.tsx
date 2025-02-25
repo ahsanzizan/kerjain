@@ -16,7 +16,7 @@ const buttonVariants = cva(
         secondary:
           "border border-primary-500 text-primary-500 hover:text-text-200 hover:bg-primary-500",
         ghost: "hover:bg-zinc-100 hover:text-zinc-900",
-        link: "text-text-400 underline-offset-4 hover:underline",
+        link: "underline-offset-4 hover:underline",
       },
       size: {
         default: "px-6 py-[0.6875rem]",
