@@ -1,9 +1,6 @@
 import { cn } from "@/lib/utils";
 import { type FC, type ReactNode } from "react";
-
-export const Navbar = () => {
-  return <></>;
-};
+import { Navbar } from "./widgets/navbar";
 
 export const Footer = () => {
   return <></>;
