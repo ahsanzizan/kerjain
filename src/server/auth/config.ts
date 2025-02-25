@@ -128,11 +128,15 @@ export const authConfig = {
     }),
   ],
   callbacks: {
-    session({ session }) {
+    session({ session, token }) {
       return {
         ...session,
         user: {
-          ...session.user,
+          id: token.user.id,
+          name: token.user.name,
+          email: token.user.email,
+          role: token.user.role,
+          image: token.user.image,
         },
       };
     },
