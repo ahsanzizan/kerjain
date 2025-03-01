@@ -9,8 +9,8 @@ export const Hero = () => {
         Temukan Pekerjaan Mikro dengan Mudah!
       </Text>
       <Text variant="title3" className="mt-7 text-text-400">
-        Akses pekerjaan fleksibel atau pekerja andal di sekitar Anda, tanpa
-        ribet dan tanpa perantara yang merugikan.
+        Akses pekerjaan fleksibel atau pekerja mikro andal di sekitar Anda,
+        tanpa ribet dan tanpa perantara yang merugikan.
       </Text>
       <div className="mt-14 flex items-center gap-x-3">
         <Link href={"#"} className={buttonVariants({ size: "lg" })}>
