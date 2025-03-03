@@ -52,6 +52,7 @@ declare module "next-auth/jwt" {
 export const authConfig = {
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   secret: env.AUTH_SECRET,
   pages: { signIn: "/auth/login" },
@@ -70,55 +71,58 @@ export const authConfig = {
           placeholder: "********",
         },
       },
-      async authorize(credentials, _) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
-
-        const { email, password } = credentials as {
-          email: string;
-          password: string;
-        };
-
+      async authorize(credentials) {
         try {
+          if (!credentials?.email || !credentials?.password) {
+            return null;
+          }
+
+          const { email, password } = credentials as {
+            email: string;
+            password: string;
+          };
+
           const user = await db.user.findUnique({
-            where: {
-              email,
-            },
+            where: { email },
             select: {
               id: true,
               name: true,
               email: true,
               image: true,
               role: true,
-              account: true,
+              account: {
+                select: { password: true, provider: true },
+              },
             },
           });
 
           if (!user?.account?.password) {
+            console.log("Invalid login attempt: user not found or no password");
             return null;
           }
 
-          if (user && credentials) {
-            const validPassword = await bcrypt.compare(
-              password,
-              user.account.password,
-            );
+          const validPassword = await bcrypt.compare(
+            password,
+            user.account.password,
+          );
 
-            if (validPassword) {
-              return {
-                id: user.id,
-                name: user.name,
-                role: user.role,
-                email: user.email,
-                image: user.image,
-              };
-            }
+          if (!validPassword) {
+            console.log("Invalid login attempt: incorrect password");
+            return null;
           }
+
+          return {
+            id: user.id,
+            name: user.name || "",
+            role: user.role,
+            email: user.email,
+            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+            image: user.image || "",
+          };
         } catch (error) {
-          console.log(error);
+          console.error("Authentication error:", error);
+          return null;
         }
-        return null;
       },
     }),
     GoogleProvider({
@@ -128,83 +132,122 @@ export const authConfig = {
     }),
   ],
   callbacks: {
-    session({ session, token }) {
-      return {
-        ...session,
-        user: {
-          id: token.user.id,
-          name: token.user.name,
-          email: token.user.email,
-          role: token.user.role,
-          image: token.user.image,
-        },
-      };
+    async session({ session, token }) {
+      // Use token data instead of querying the database
+      if (token.user && session.user) {
+        session.user.id = token.user.id;
+        session.user.role = token.user.role;
+        session.user.name = token.user.name;
+        session.user.email = token.user.email;
+        session.user.image = token.user.image || "";
+
+        // Only update last_login occasionally (e.g., once per day)
+        // This reduces database writes
+        const lastLoginUpdate = (token.lastLoginUpdate as number) || 0;
+        const oneDayInMs = 24 * 60 * 60 * 1000;
+
+        if (Date.now() - lastLoginUpdate > oneDayInMs) {
+          await db.user.update({
+            where: { id: token.user.id },
+            data: {
+              account: { update: { last_login: new Date() } },
+            },
+          });
+          token.lastLoginUpdate = Date.now();
+        }
+      }
+      return session;
     },
+
     async redirect({ url, baseUrl }) {
-      return url.startsWith("/") ? new URL(url, baseUrl).toString() : url;
+      // Security check to prevent open redirects
+      if (url.startsWith(baseUrl) || url.startsWith("/")) {
+        return url.startsWith("/") ? new URL(url, baseUrl).toString() : url;
+      }
+      return baseUrl;
     },
-    async signIn({ user }) {
-      if (!user.email) return false;
 
-      const existingUser = await db.user.findUnique({
-        where: { email: user.email },
-      });
+    async signIn({ user, account }) {
+      try {
+        if (!user.email) return false;
 
-      // If the user does not exist, then it's a Google sign-in
-      if (!existingUser) {
-        try {
+        const existingUser = await db.user.findUnique({
+          where: { email: user.email },
+          select: {
+            id: true,
+            role: true,
+            account: { select: { provider: true } },
+          },
+        });
+
+        // If user doesn't exist, create new user (Google sign-in)
+        if (!existingUser && account?.provider === "google") {
           await db.user.create({
             data: {
               image:
+                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                user.image ||
                 "https://res.cloudinary.com/mokletorg/image/upload/v1710992405/user.svg",
               email: user.email,
-              name: user.name ?? user.email.split("@")[0] ?? "Unnamed",
+              // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+              name: user.name || user.email.split("@")[0] || "Unnamed",
               role: "NONE",
               emailVerified: new Date(),
               account: {
                 create: {
                   provider: "Google",
+                  last_login: new Date(),
                 },
               },
             },
           });
-        } catch (error) {
-          console.error("Error creating user:", error);
+          return true;
+        }
+
+        // If user exists but credentials don't match provider, prevent sign-in
+        if (
+          existingUser &&
+          account?.provider === "google" &&
+          existingUser.account?.provider !== "Google" &&
+          existingUser.account?.provider !== "credentials+google"
+        ) {
+          console.error("Account exists with different provider");
           return false;
         }
-      }
 
-      return true;
+        // Update last login time
+        if (existingUser) {
+          await db.user.update({
+            where: { id: existingUser.id },
+            data: {
+              account: { update: { last_login: new Date() } },
+            },
+          });
+        }
+
+        return true;
+      } catch (error) {
+        console.error("Error in signIn callback:", error);
+        return false;
+      }
     },
+
     async jwt({ token, user }) {
+      // Add user data to token when first signing in
       if (user) {
-        // On initial sign in, get all user data we need
-        const userdb = await db.user.findUnique({ where: { id: user.id } });
-
-        if (!userdb) return token;
-
-        // Update last login time during JWT creation
-        await db.user.update({
-          where: { id: user.id },
-          data: {
-            image: token.image ?? undefined,
-            account: { update: { last_login: new Date() } },
-          },
-        });
-
-        const { id, role, name, email, image } = userdb;
-
         token.user = {
-          id,
-          name,
-          role,
-          email,
-          image:
-            image ??
-            "https://res.cloudinary.com/mokletorg/image/upload/v1710992405/user.svg",
+          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+          id: user.id || "",
+          role: user.role || "NONE",
+          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+          name: user.name || "",
+          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+          email: user.email || "",
+          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+          image: user.image || "",
         };
+        token.lastLoginUpdate = Date.now();
       }
-
       return token;
     },
   },
