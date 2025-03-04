@@ -6,7 +6,7 @@ export default async function MainLayout(props: { children?: ReactNode }) {
   const session = await auth();
   if (!session) return redirect("/");
 
-  if (session.user.role === "NONE") return redirect("/choose-role");
+  if (session.user.role === "NONE") return redirect("/profile-completion");
 
   return <>{props.children}</>;
 }

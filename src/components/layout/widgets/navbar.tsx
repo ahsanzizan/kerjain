@@ -58,7 +58,7 @@ export const Navbar = () => {
               )}
             {status === "authenticated" && session.user.role === "NONE" && (
               <Link
-                href={"/choose-role"}
+                href={"/profile-completion"}
                 className={buttonVariants({
                   variant: "default",
                   className: "ml-6 w-full text-center",
@@ -149,7 +149,7 @@ export const Navbar = () => {
               )}
             {status === "authenticated" && session.user.role === "NONE" && (
               <Link
-                href={"/choose-role"}
+                href={"/profile-completion"}
                 className={buttonVariants({
                   variant: "default",
                   className: "ml-6 w-full text-center",
