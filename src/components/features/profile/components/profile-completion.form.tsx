@@ -21,9 +21,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { updateUserProfile } from "@/server/actions/profile";
+import { useRouter } from "@bprogress/next";
 import { MapPin, Plus, User, X } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
+import { toast } from "sonner";
 
 // Enum for roles to match the schema
 enum Role {
@@ -68,9 +71,11 @@ const ProfileCompletion: React.FC = () => {
     preferredRadius: 5, // Default 5 km
     jobPreferences: [],
   });
+  const router = useRouter();
 
   const [step, setStep] = useState<number>(1);
   const [customJobCategory, setCustomJobCategory] = useState<string>("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = <K extends keyof ProfileFormData>(
     field: K,
@@ -355,10 +360,31 @@ const ProfileCompletion: React.FC = () => {
                   <AlertDialogFooter>
                     <AlertDialogCancel>Ubah</AlertDialogCancel>
                     <AlertDialogAction
-                      onClick={() => {
-                        // TODO: typically call an API to save the profile
-                        console.log("Profile submitted:", formData);
+                      onClick={async () => {
+                        setLoading(true);
+                        const loadingToast = toast.loading("Loading...");
+
+                        const registerResult = await updateUserProfile({
+                          ...formData,
+                          latitude: formData.latitude ?? undefined,
+                          longitude: formData.longitude ?? undefined,
+                        });
+
+                        if (!registerResult.success) {
+                          setLoading(false);
+                          toast.error(registerResult.message, {
+                            id: loadingToast,
+                          });
+                          return;
+                        }
+
+                        toast.success("Berhasil memperbarui profil!", {
+                          id: loadingToast,
+                        });
+                        setLoading(false);
+                        router.push("/");
                       }}
+                      disabled={loading}
                     >
                       Kirim Profil
                     </AlertDialogAction>

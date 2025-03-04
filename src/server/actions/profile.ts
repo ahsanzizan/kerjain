@@ -1,7 +1,8 @@
 "use server";
 
+import { Role } from "@prisma/client";
 import { z } from "zod";
-import { auth } from "../auth";
+import { auth, updateSession } from "../auth";
 import { db } from "../db";
 import { errorResponse, successResponse } from "../utils/action-response";
 import { validateActionInput } from "../utils/validate-action-input";
@@ -9,9 +10,12 @@ import { validateActionInput } from "../utils/validate-action-input";
 type UpdateUserProfileInput = {
   name?: string;
   image?: string;
+  role?: Role;
   address?: string;
   preferredRadius?: number;
   jobPreferences?: string[];
+  latitude?: number;
+  longitude?: number;
 };
 
 export async function updateUserProfile(input: UpdateUserProfileInput) {
@@ -21,9 +25,12 @@ export async function updateUserProfile(input: UpdateUserProfileInput) {
       z.object({
         name: z.string().optional(),
         image: z.string().url().optional(),
+        role: z.nativeEnum(Role).optional(),
         address: z.string().optional(),
         preferredRadius: z.number().min(1).max(100).optional(),
         jobPreferences: z.array(z.string()).optional(),
+        latitude: z.number().optional(),
+        longitude: z.number().optional(),
       }),
     );
 
@@ -36,6 +43,8 @@ export async function updateUserProfile(input: UpdateUserProfileInput) {
         ...input,
       },
     });
+
+    await updateSession({ user: { role: input.role } });
 
     return successResponse(
       {
