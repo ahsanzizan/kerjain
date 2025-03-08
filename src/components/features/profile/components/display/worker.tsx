@@ -3,6 +3,7 @@
 import { PageContainer } from "@/components/layout/page-container";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -13,12 +14,14 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { type Prisma } from "@prisma/client";
 import {
+  ArrowLeft,
   BriefcaseBusiness,
   CircleCheck,
   Clock,
   MapPin,
   Star,
 } from "lucide-react";
+import Link from "next/link";
 import { type FC, useState } from "react";
 
 const WorkerProfile: FC<{
@@ -90,6 +93,12 @@ const WorkerProfile: FC<{
   return (
     <PageContainer withFooter>
       <div className="bg-primary-50/30 container mx-auto max-w-6xl p-8">
+        <Link
+          href="/worker"
+          className={buttonVariants({ variant: "default", className: "mb-8" })}
+        >
+          <ArrowLeft /> Kembali
+        </Link>
         {/* Profile Header */}
         <div className="mb-6 flex flex-col gap-6 md:flex-row">
           <div className="flex-shrink-0">
