@@ -24,7 +24,7 @@ const items = [
         className="flex aspect-video min-h-[7rem] w-full flex-1 rounded-lg object-cover"
       />
     ),
-    icon: <GraduationCap className="size-4 text-primary-500" />,
+    icon: <GraduationCap className="size-6 text-primary-500" />,
   },
   {
     title: "Jasa Pengantaran",
@@ -39,7 +39,7 @@ const items = [
         className="flex aspect-video min-h-[7rem] w-full flex-1 rounded-lg object-cover"
       />
     ),
-    icon: <IconBox className="size-4 text-primary-500" />,
+    icon: <IconBox className="size-6 text-primary-500" />,
   },
   {
     title: "Pekerja Kreatif",
@@ -54,7 +54,7 @@ const items = [
         className="flex aspect-video min-h-[7rem] w-full flex-1 rounded-lg object-cover"
       />
     ),
-    icon: <IconSignature className="size-4 text-primary-500" />,
+    icon: <IconSignature className="size-6 text-primary-500" />,
   },
   {
     title: "Jasa Rumah Tangga",
@@ -69,7 +69,7 @@ const items = [
         className="flex aspect-video min-h-[7rem] w-full flex-1 rounded-lg object-cover"
       />
     ),
-    icon: <IconVacuumCleaner className="size-4 text-primary-500" />,
+    icon: <IconVacuumCleaner className="size-6 text-primary-500" />,
   },
   {
     title: "Layanan Digital",
@@ -84,7 +84,7 @@ const items = [
         className="flex aspect-video min-h-[7rem] w-full flex-1 rounded-lg object-cover"
       />
     ),
-    icon: <IconArrowWaveRightUp className="size-4 text-primary-500" />,
+    icon: <IconArrowWaveRightUp className="size-6 text-primary-500" />,
   },
 ] as const;
 
@@ -96,7 +96,7 @@ export const FeaturedCategories = () => {
         <Text variant="large1-semibold" className="text-balance">
           Kategori Pekerjaan Mikro Unggulan di Kerjain!
         </Text>
-        <Text className="mt-7 text-text-400">
+        <Text variant="title3" className="mt-7 text-text-400">
           Temukan berbagai peluang kerja dan layanan yang paling dibutuhkan!
           Dari jasa rumah tangga hingga pekerjaan digital, Kerjain mempermudah
           koneksi Anda dengan peluang terbaik sesuai keterampilan dan kebutuhan

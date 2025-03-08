@@ -25,7 +25,7 @@ const StepCard: FC<Step> = ({ order, title, points }) => {
               {points.worker.map((point, index) => (
                 <li key={index} className="flex items-start gap-x-2">
                   <span className="aspect-video">-</span>
-                  <Text className="text-text-400 transition-all duration-300 group-hover:text-text-200/85">
+                  <Text variant="body" className="text-text-400 transition-all duration-300 group-hover:text-text-200/85">
                     {point}
                   </Text>
                 </li>
@@ -58,7 +58,7 @@ export const HowItWorks = () => {
     <section id="how-it-works" className="py-28">
       <SectionTag>#CaraPakai</SectionTag>
       <Text variant="large1-semibold">Bingung, ya? Gini Cara Pakainya!</Text>
-      <Text className="mt-7 text-text-400">
+      <Text variant="title3" className="mt-7 text-text-400">
         Kerjain bikin koneksi antara pekerja dan penyedia lapangan kerja lebih
         gampang dengan tiga langkah simpel.
       </Text>

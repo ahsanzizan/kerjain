@@ -28,15 +28,13 @@ export const Navbar = () => {
           </Link>
           <ul className="hidden lg:flex lg:items-center lg:gap-10">
             {NAV_ITEMS.map((item, index) => (
-              <li key={index}>
+              <li key={index} className="relative">
                 <Link
                   href={item.href}
-                  className={buttonVariants({
-                    variant: "link",
-                    size: "link",
-                  })}
+                  className="group relative pb-1 text-black no-underline"
                 >
                   {item.title}
+                  <span className="absolute bottom-0 left-0 h-0.5 w-full origin-left scale-x-0 transform bg-primary-600 transition-transform duration-300 group-hover:scale-x-100"></span>
                 </Link>
               </li>
             ))}
@@ -167,7 +165,7 @@ export const Navbar = () => {
                   href={"/auth/login"}
                   className={buttonVariants({
                     variant: "secondary",
-                    className: "w-full text-center",
+                    className: "mb-3 w-full text-center",
                   })}
                   onClick={() => {
                     navbarToggle.current!.checked = false;

@@ -1,5 +1,6 @@
+"use client";
+
 import { Text } from "@/components/common/text";
-import { buttonVariants } from "@/components/ui/button";
 import { type NavItem } from "@/types/nav-item";
 import Image from "next/image";
 import Link from "next/link";
@@ -43,17 +44,15 @@ export const Footer = () => {
             </Text>
             <ul className="mt-6 flex flex-col gap-y-[0.625rem]">
               {FOOTER_LINKS.company.map((item, index) => (
-                <Link
-                  key={index}
-                  href={item.href}
-                  className={buttonVariants({
-                    variant: "link",
-                    size: "link",
-                    className: "text-text-200",
-                  })}
-                >
-                  {item.title}
-                </Link>
+                <li key={index}>
+                  <Link
+                    href={item.href}
+                    className="group relative pb-1 text-text-200 no-underline"
+                  >
+                    {item.title}
+                    <span className="absolute bottom-0 left-0 h-0.5 w-full origin-left scale-x-0 transform bg-text-200 transition-transform duration-300 group-hover:scale-x-100"></span>
+                  </Link>
+                </li>
               ))}
             </ul>
           </div>
@@ -63,17 +62,15 @@ export const Footer = () => {
             </Text>
             <ul className="mt-6 flex flex-col gap-y-[0.625rem]">
               {FOOTER_LINKS.support.map((item, index) => (
-                <Link
-                  key={index}
-                  href={item.href}
-                  className={buttonVariants({
-                    variant: "link",
-                    size: "link",
-                    className: "text-text-200",
-                  })}
-                >
-                  {item.title}
-                </Link>
+                <li key={index}>
+                  <Link
+                    href={item.href}
+                    className="group relative pb-1 text-text-200 no-underline"
+                  >
+                    {item.title}
+                    <span className="absolute bottom-0 left-0 h-0.5 w-full origin-left scale-x-0 transform bg-text-200 transition-transform duration-300 group-hover:scale-x-100"></span>
+                  </Link>
+                </li>
               ))}
             </ul>
           </div>
