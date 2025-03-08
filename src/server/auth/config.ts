@@ -132,7 +132,16 @@ export const authConfig = {
     }),
   ],
   callbacks: {
-    async session({ session, token }) {
+    async session({ session, token, trigger, newSession }) {
+      if (trigger === "update") {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        if (newSession.user.role) session.user.role = newSession.user.role;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        if (newSession.user.name) session.user.name = newSession.user.name;
+
+        return session;
+      }
+
       // Use token data instead of querying the database
       if (token.user && session.user) {
         session.user.id = token.user.id;
@@ -141,19 +150,23 @@ export const authConfig = {
         session.user.email = token.user.email;
         session.user.image = token.user.image || "";
 
-        // Only update last_login occasionally (e.g., once per day)
-        // This reduces database writes
         const lastLoginUpdate = (token.lastLoginUpdate as number) || 0;
         const oneDayInMs = 24 * 60 * 60 * 1000;
 
         if (Date.now() - lastLoginUpdate > oneDayInMs) {
-          await db.user.update({
+          const user = await db.user.findUnique({
             where: { id: token.user.id },
-            data: {
-              account: { update: { last_login: new Date() } },
-            },
           });
-          token.lastLoginUpdate = Date.now();
+
+          if (user) {
+            await db.user.update({
+              where: { id: token.user.id },
+              data: {
+                account: { update: { last_login: new Date() } },
+              },
+            });
+            token.lastLoginUpdate = Date.now();
+          }
         }
       }
       return session;
@@ -181,7 +194,7 @@ export const authConfig = {
         });
 
         // If user doesn't exist, create new user (Google sign-in)
-        if (!existingUser && account?.provider === "google") {
+        if (!existingUser) {
           await db.user.create({
             data: {
               image:
@@ -232,21 +245,34 @@ export const authConfig = {
       }
     },
 
-    async jwt({ token, user }) {
-      // Add user data to token when first signing in
-      if (user) {
+    async jwt({ token, user, trigger, session }) {
+      if (trigger === "update") {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        if (session.user.role) token.user.role = session.user.role;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        if (session.user.name) token.user.name = session.user.name;
+
+        return token;
+      }
+
+      if (user?.email) {
+        const userDb = await db.user.findUnique({
+          where: { email: user.email },
+        });
+
+        if (!userDb) return token;
+
         token.user = {
+          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          id: userDb.id || "",
+          role: userDb.role,
           // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-          id: user.id || "",
-          role: user.role || "NONE",
+          name: userDb.name || "",
           // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-          name: user.name || "",
+          email: userDb.email || "",
           // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-          email: user.email || "",
-          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-          image: user.image || "",
+          image: userDb.image || "",
         };
-        token.lastLoginUpdate = Date.now();
       }
       return token;
     },
