@@ -43,6 +43,8 @@ export const registerUser = async (input: {
       data: {
         name,
         email,
+        image:
+          "https://res.cloudinary.com/mokletorg/image/upload/v1710992405/user.svg",
         account: {
           create: { provider: "Credentials", password: hashedPassword },
         },

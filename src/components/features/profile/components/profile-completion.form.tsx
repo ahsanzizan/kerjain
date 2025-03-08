@@ -24,10 +24,10 @@ import {
 import { updateUserProfile } from "@/server/actions/profile";
 import { useRouter } from "@bprogress/next";
 import { MapPin, Plus, User, X } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import React, { useState } from "react";
 import { toast } from "sonner";
-
 // Enum for roles to match the schema
 enum Role {
   NONE = "NONE",
@@ -61,7 +61,7 @@ interface ProfileFormData {
   jobPreferences: JobCategory[];
 }
 
-const ProfileCompletion: React.FC = () => {
+export const ProfileCompletion: React.FC = () => {
   const [formData, setFormData] = useState<ProfileFormData>({
     name: "",
     role: Role.NONE,
@@ -72,6 +72,7 @@ const ProfileCompletion: React.FC = () => {
     jobPreferences: [],
   });
   const router = useRouter();
+  const { update } = useSession();
 
   const [step, setStep] = useState<number>(1);
   const [customJobCategory, setCustomJobCategory] = useState<string>("");
@@ -378,6 +379,10 @@ const ProfileCompletion: React.FC = () => {
                           return;
                         }
 
+                        await update({
+                          user: { name: formData.name, role: formData.role },
+                        });
+
                         toast.success("Berhasil memperbarui profil!", {
                           id: loadingToast,
                         });
@@ -421,5 +426,3 @@ const ProfileCompletion: React.FC = () => {
     </div>
   );
 };
-
-export default ProfileCompletion;

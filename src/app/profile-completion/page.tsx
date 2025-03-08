@@ -1,5 +1,5 @@
-import { ChooseRole } from "@/components/features/profile/pages/profile-completion.page";
+import { ProfileCompletion } from "@/components/features/profile/pages/profile-completion.page";
 
-const Page = ChooseRole;
+const Page = ProfileCompletion;
 
 export default Page;

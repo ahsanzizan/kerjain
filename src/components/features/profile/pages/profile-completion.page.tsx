@@ -1,10 +1,10 @@
 import { PageContainer } from "@/components/layout/page-container";
-import ProfileCompletion from "../components/profile-completion.form";
+import { ProfileCompletion as ProfileCompletionForm } from "../components/profile-completion.form";
 
-export const ChooseRole = () => {
+export const ProfileCompletion = () => {
   return (
     <PageContainer center>
-      <ProfileCompletion />
+      <ProfileCompletionForm />
     </PageContainer>
   );
 };

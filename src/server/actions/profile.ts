@@ -37,6 +37,9 @@ export async function updateUserProfile(input: UpdateUserProfileInput) {
     const session = await auth();
     if (!session) return errorResponse("Unauthorized");
 
+    const user = await db.user.findUnique({ where: { id: session.user.id } });
+    if (!user) return errorResponse("User not found.");
+
     const updatedUser = await db.user.update({
       where: { id: session.user.id },
       data: {
