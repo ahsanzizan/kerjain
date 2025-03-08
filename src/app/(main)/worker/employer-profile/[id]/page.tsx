@@ -6,9 +6,9 @@ import { notFound } from "next/navigation";
 export default async function EmployerProfilePage({
   params,
 }: {
-  params: { id?: string };
+  params: Promise<{ id?: string }>;
 }) {
-  const { id } = params;
+  const { id } = await params;
   const session = await auth();
 
   if (!session || session.user.role !== "EMPLOYER" || !id) return notFound();

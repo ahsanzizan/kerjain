@@ -70,7 +70,7 @@ const EmployerProfile: FC<{
             0,
           ) / profile.reviewsReceived.length
         ).toFixed(1)
-      : "No ratings yet";
+      : "Belum ada penilaian";
 
   // Count applications by status
   const applicationCounts = profile.postedGigs.reduce(
@@ -88,7 +88,7 @@ const EmployerProfile: FC<{
     <PageContainer withFooter>
       <div className="bg-primary-50/30 container mx-auto max-w-6xl p-8">
         <Link
-          href="/worker"
+          href="/employer"
           className={buttonVariants({ variant: "default", className: "mb-8" })}
         >
           <ArrowLeft /> Kembali
@@ -126,10 +126,10 @@ const EmployerProfile: FC<{
                   </div>
                 )}
                 <p className="text-sm text-primary-600/80">
-                  {profile.reviewsReceived.length} reviews
+                  {profile.reviewsReceived.length} ulasan
                 </p>
                 <p className="text-sm text-primary-600/80">
-                  Member since{" "}
+                  Anggota sejak{" "}
                   {new Date(profile.createdAt).toLocaleDateString()}
                 </p>
               </div>
@@ -144,19 +144,19 @@ const EmployerProfile: FC<{
               value="overview"
               className="data-[state=active]:bg-primary-600 data-[state=active]:text-white"
             >
-              Overview
+              Profil Singkat
             </TabsTrigger>
             <TabsTrigger
               value="gigs"
               className="data-[state=active]:bg-primary-600 data-[state=active]:text-white"
             >
-              Gigs ({profile.postedGigs.length})
+              Pekerjaan ({profile.postedGigs.length})
             </TabsTrigger>
             <TabsTrigger
               value="reviews"
               className="data-[state=active]:bg-primary-600 data-[state=active]:text-white"
             >
-              Reviews ({profile.reviewsReceived.length})
+              Ulasan ({profile.reviewsReceived.length})
             </TabsTrigger>
           </TabsList>
 
@@ -166,7 +166,7 @@ const EmployerProfile: FC<{
               <Card className="border-primary-200 bg-white shadow-sm">
                 <CardHeader className="bg-primary-50 border-b border-primary-100 pb-2">
                   <CardTitle className="text-primary-800">
-                    Posted Gigs
+                    Pekerjaan Diposting
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-4">
@@ -179,7 +179,7 @@ const EmployerProfile: FC<{
               <Card className="border-primary-200 bg-white shadow-sm">
                 <CardHeader className="bg-primary-50 border-b border-primary-100 pb-2">
                   <CardTitle className="text-primary-800">
-                    Received Applications
+                    Lamaran Diterima
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-4">
@@ -197,7 +197,14 @@ const EmployerProfile: FC<{
                           variant="outline"
                           className="border-primary-300 text-primary-700"
                         >
-                          {status}: {count}
+                          {status === "PENDING"
+                            ? "MENUNGGU"
+                            : status === "ACCEPTED"
+                              ? "DITERIMA"
+                              : status === "REJECTED"
+                                ? "DITOLAK"
+                                : status}
+                          : {count}
                         </Badge>
                       ),
                     )}
@@ -207,7 +214,7 @@ const EmployerProfile: FC<{
 
               <Card className="border-primary-200 bg-white shadow-sm">
                 <CardHeader className="bg-primary-50 border-b border-primary-100 pb-2">
-                  <CardTitle className="text-primary-800">Rating</CardTitle>
+                  <CardTitle className="text-primary-800">Penilaian</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-4">
                   <div className="flex items-center gap-1">
@@ -225,9 +232,11 @@ const EmployerProfile: FC<{
             {/* Recent activity */}
             <Card className="border-primary-200 bg-white shadow-sm">
               <CardHeader className="bg-primary-50 border-b border-primary-100">
-                <CardTitle className="text-primary-800">Recent Gigs</CardTitle>
+                <CardTitle className="text-primary-800">
+                  Pekerjaan Terbaru
+                </CardTitle>
                 <CardDescription className="text-primary-600/70">
-                  Recently posted gigs
+                  Pekerjaan yang baru diposting
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-6">
@@ -241,7 +250,17 @@ const EmployerProfile: FC<{
                         <h3 className="font-medium text-primary-800">
                           {gig.title}
                         </h3>
-                        <Badge className="bg-primary-600">{gig.status}</Badge>
+                        <Badge className="bg-primary-600">
+                          {gig.status === "OPEN"
+                            ? "BUKA"
+                            : gig.status === "CANCELED"
+                              ? "BATAL"
+                              : gig.status === "IN_PROGRESS"
+                                ? "SEDANG BERJALAN"
+                                : gig.status === "COMPLETED"
+                                  ? "SELESAI"
+                                  : gig.status}
+                        </Badge>
                       </div>
                       <p className="mt-1 line-clamp-2 text-sm text-primary-600/80">
                         {gig.description}
@@ -269,7 +288,7 @@ const EmployerProfile: FC<{
             {profile.postedGigs.length === 0 ? (
               <Card className="border-primary-200 bg-white shadow-sm">
                 <CardContent className="pt-6 text-center text-primary-600">
-                  <p>No gigs posted yet.</p>
+                  <p>Belum ada pekerjaan yang diposting.</p>
                 </CardContent>
               </Card>
             ) : (
@@ -288,23 +307,35 @@ const EmployerProfile: FC<{
                           {gig.category}
                         </CardDescription>
                       </div>
-                      <Badge className="bg-primary-600">{gig.status}</Badge>
+                      <Badge className="bg-primary-600">
+                        {gig.status === "OPEN"
+                          ? "BUKA"
+                          : gig.status === "CANCELED"
+                            ? "BATAL"
+                            : gig.status === "IN_PROGRESS"
+                              ? "SEDANG BERJALAN"
+                              : gig.status === "COMPLETED"
+                                ? "SELESAI"
+                                : gig.status}
+                      </Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="pt-6">
                     <p className="mb-3 text-primary-700">{gig.description}</p>
                     <div className="mb-4 flex items-center gap-2">
-                      <span className="font-medium text-primary-800">Pay:</span>
+                      <span className="font-medium text-primary-800">
+                        Bayaran:
+                      </span>
                       <span className="text-primary-700">${gig.pay}</span>
                     </div>
 
                     <div>
                       <h4 className="mb-2 font-medium text-primary-800">
-                        Applications ({gig.applications.length})
+                        Lamaran ({gig.applications.length})
                       </h4>
                       {gig.applications.length === 0 ? (
                         <p className="text-sm text-primary-600/70">
-                          No applications yet
+                          Belum ada lamaran
                         </p>
                       ) : (
                         <div className="space-y-2">
@@ -336,7 +367,13 @@ const EmployerProfile: FC<{
                                 variant="outline"
                                 className="border-primary-300 text-primary-700"
                               >
-                                {app.status}
+                                {app.status === "PENDING"
+                                  ? "MENUNGGU"
+                                  : app.status === "ACCEPTED"
+                                    ? "DITERIMA"
+                                    : app.status === "REJECTED"
+                                      ? "DITOLAK"
+                                      : app.status}
                               </Badge>
                             </div>
                           ))}
@@ -354,7 +391,7 @@ const EmployerProfile: FC<{
             {profile.reviewsReceived.length === 0 ? (
               <Card className="border-primary-200 bg-white shadow-sm">
                 <CardContent className="pt-6 text-center text-primary-600">
-                  <p>No reviews yet.</p>
+                  <p>Belum ada ulasan.</p>
                 </CardContent>
               </Card>
             ) : (
