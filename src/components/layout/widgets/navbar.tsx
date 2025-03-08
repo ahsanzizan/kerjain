@@ -48,7 +48,7 @@ export const Navbar = () => {
                   }
                   className={buttonVariants({
                     variant: "default",
-                    className: "ml-6 w-full text-center",
+                    className: "ml-6 text-center",
                   })}
                 >
                   Dashboard
@@ -59,7 +59,7 @@ export const Navbar = () => {
                 href={"/profile-completion"}
                 className={buttonVariants({
                   variant: "default",
-                  className: "ml-6 w-full text-center",
+                  className: "ml-6 text-center",
                 })}
               >
                 Dashboard
@@ -138,7 +138,7 @@ export const Navbar = () => {
                   }
                   className={buttonVariants({
                     variant: "default",
-                    className: "ml-6 w-full text-center",
+                    className: "ml-6 text-center",
                   })}
                   onClick={() => {
                     navbarToggle.current!.checked = false;
@@ -152,7 +152,7 @@ export const Navbar = () => {
                 href={"/profile-completion"}
                 className={buttonVariants({
                   variant: "default",
-                  className: "ml-6 w-full text-center",
+                  className: "ml-6 text-center",
                 })}
                 onClick={() => {
                   navbarToggle.current!.checked = false;
