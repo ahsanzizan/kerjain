@@ -78,7 +78,7 @@ const WorkerProfile: FC<{
             0,
           ) / profile.reviewsReceived.length
         ).toFixed(1)
-      : "No ratings yet";
+      : "Belum ada penilaian";
 
   // Count applications by status
   const applicationCounts = profile.applications.reduce(
@@ -135,10 +135,10 @@ const WorkerProfile: FC<{
                   </div>
                 )}
                 <p className="text-sm text-primary-600/80">
-                  {profile.reviewsReceived.length} reviews
+                  {profile.reviewsReceived.length} ulasan
                 </p>
                 <p className="text-sm text-primary-600/80">
-                  Member since{" "}
+                  Anggota sejak{" "}
                   {new Date(profile.createdAt).toLocaleDateString()}
                 </p>
               </div>
@@ -153,25 +153,25 @@ const WorkerProfile: FC<{
               value="overview"
               className="data-[state=active]:bg-primary-600 data-[state=active]:text-white"
             >
-              Overview
+              Profil Singkat
             </TabsTrigger>
             <TabsTrigger
               value="preferences"
               className="data-[state=active]:bg-primary-600 data-[state=active]:text-white"
             >
-              Preferences
+              Preferensi
             </TabsTrigger>
             <TabsTrigger
               value="applications"
               className="data-[state=active]:bg-primary-600 data-[state=active]:text-white"
             >
-              Applications ({profile.applications.length})
+              Lamaran ({profile.applications.length})
             </TabsTrigger>
             <TabsTrigger
               value="reviews"
               className="data-[state=active]:bg-primary-600 data-[state=active]:text-white"
             >
-              Reviews ({profile.reviewsReceived.length})
+              Ulasan ({profile.reviewsReceived.length})
             </TabsTrigger>
           </TabsList>
 
@@ -180,9 +180,7 @@ const WorkerProfile: FC<{
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <Card className="border-primary-200 bg-white shadow-sm">
                 <CardHeader className="bg-primary-50 border-b border-primary-100 pb-2">
-                  <CardTitle className="text-primary-800">
-                    Applications
-                  </CardTitle>
+                  <CardTitle className="text-primary-800">Lamaran</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-4">
                   <p className="text-3xl font-bold text-primary-700">
@@ -196,7 +194,14 @@ const WorkerProfile: FC<{
                           variant="outline"
                           className="border-primary-300 text-primary-700"
                         >
-                          {status}: {count}
+                          {status === "PENDING"
+                            ? "TERTUNDA"
+                            : status === "ACCEPTED"
+                              ? "DITERIMA"
+                              : status === "REJECTED"
+                                ? "DITOLAK"
+                                : status}
+                          : {count}
                         </Badge>
                       ),
                     )}
@@ -207,20 +212,23 @@ const WorkerProfile: FC<{
               <Card className="border-primary-200 bg-white shadow-sm">
                 <CardHeader className="bg-primary-50 border-b border-primary-100 pb-2">
                   <CardTitle className="text-primary-800">
-                    Work Radius
+                    Radius Kerja
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-4">
                   <div className="flex items-center">
                     <MapPin className="mr-2 h-5 w-5 text-primary-700" />
                     <p className="text-xl font-bold text-primary-700">
-                      {profile.preferredRadius ?? "Not specified"}{" "}
+                      {profile.preferredRadius ?? "Belum ditentukan"}{" "}
                       {profile.preferredRadius ? "KM" : ""}
                     </p>
                   </div>
                   {profile.address && (
-                    <p className="mt-2 text-sm text-primary-600/80">
-                      From: {profile.address}
+                    <p className="mt-2 text-sm text-text-500">
+                      Dari:{" "}
+                      <span className="text-primary-600/80">
+                        {profile.address}
+                      </span>
                     </p>
                   )}
                 </CardContent>
@@ -228,7 +236,7 @@ const WorkerProfile: FC<{
 
               <Card className="border-primary-200 bg-white shadow-sm">
                 <CardHeader className="bg-primary-50 border-b border-primary-100 pb-2">
-                  <CardTitle className="text-primary-800">Rating</CardTitle>
+                  <CardTitle className="text-primary-800">Penilaian</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-4">
                   <div className="flex items-center gap-1">
@@ -247,10 +255,10 @@ const WorkerProfile: FC<{
             <Card className="border-primary-200 bg-white shadow-sm">
               <CardHeader className="bg-primary-50 border-b border-primary-100">
                 <CardTitle className="text-primary-800">
-                  Recent Applications
+                  Lamaran Terbaru
                 </CardTitle>
                 <CardDescription className="text-primary-600/70">
-                  Recently applied gigs
+                  Pekerjaan yang baru-baru ini dilamar
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-6">
@@ -264,10 +272,18 @@ const WorkerProfile: FC<{
                         <h3 className="font-medium text-primary-800">
                           {app.gig.title}
                         </h3>
-                        <Badge className="bg-primary-600">{app.status}</Badge>
+                        <Badge className="bg-primary-600">
+                          {app.status === "PENDING"
+                            ? "TERTUNDA"
+                            : app.status === "ACCEPTED"
+                              ? "DITERIMA"
+                              : app.status === "REJECTED"
+                                ? "DITOLAK"
+                                : app.status}
+                        </Badge>
                       </div>
                       <p className="mt-1 text-sm text-primary-600/80">
-                        <span className="font-medium">Employer:</span>{" "}
+                        <span className="font-medium">Pemberi Kerja:</span>{" "}
                         {app.gig.employer.name}
                       </p>
                       <div className="mt-2 flex items-center gap-2">
@@ -290,10 +306,10 @@ const WorkerProfile: FC<{
             <Card className="border-primary-200 bg-white shadow-sm">
               <CardHeader className="bg-primary-50 border-b border-primary-100">
                 <CardTitle className="text-primary-800">
-                  Job Preferences
+                  Preferensi Pekerjaan
                 </CardTitle>
                 <CardDescription className="text-primary-600/70">
-                  Categories and types of work interested in
+                  Kategori dan jenis pekerjaan yang diminati
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-6">
@@ -301,7 +317,7 @@ const WorkerProfile: FC<{
                   <div className="space-y-4">
                     <div>
                       <h3 className="mb-2 font-medium text-primary-800">
-                        Preferred Categories
+                        Kategori yang Disukai
                       </h3>
                       <div className="flex flex-wrap gap-2">
                         {typeof profile.jobPreferences === "object" &&
@@ -319,7 +335,7 @@ const WorkerProfile: FC<{
                   </div>
                 ) : (
                   <p className="text-primary-600">
-                    No job preferences set yet.
+                    Belum ada preferensi pekerjaan yang ditetapkan.
                   </p>
                 )}
               </CardContent>
@@ -328,38 +344,38 @@ const WorkerProfile: FC<{
             <Card className="border-primary-200 bg-white shadow-sm">
               <CardHeader className="bg-primary-50 border-b border-primary-100">
                 <CardTitle className="text-primary-800">
-                  Location Settings
+                  Pengaturan Lokasi
                 </CardTitle>
                 <CardDescription className="text-primary-600/70">
-                  Work radius and address information
+                  Radius kerja dan informasi alamat
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-6">
                 <div className="space-y-4">
                   <div>
                     <h3 className="mb-1 font-medium text-primary-800">
-                      Address
+                      Alamat
                     </h3>
                     <p className="text-primary-700">
-                      {profile.address ?? "Not specified"}
+                      {profile.address ?? "Belum ditentukan"}
                     </p>
                   </div>
 
                   <div>
                     <h3 className="mb-1 font-medium text-primary-800">
-                      Preferred Work Radius
+                      Radius Kerja yang Disukai
                     </h3>
                     <p className="text-primary-700">
                       {profile.preferredRadius
-                        ? `${profile.preferredRadius} miles`
-                        : "Not specified"}
+                        ? `${profile.preferredRadius} kilometer`
+                        : "Belum ditentukan"}
                     </p>
                   </div>
 
                   {profile.latitude && profile.longitude && (
                     <div>
                       <h3 className="mb-1 font-medium text-primary-800">
-                        Coordinates
+                        Koordinat
                       </h3>
                       <p className="text-primary-700">
                         {profile.latitude.toFixed(4)},{" "}
@@ -377,7 +393,7 @@ const WorkerProfile: FC<{
             {profile.applications.length === 0 ? (
               <Card className="border-primary-200 bg-white shadow-sm">
                 <CardContent className="pt-6 text-center text-primary-600">
-                  <p>No applications submitted yet.</p>
+                  <p>Belum ada lamaran yang diajukan.</p>
                 </CardContent>
               </Card>
             ) : (
@@ -411,7 +427,13 @@ const WorkerProfile: FC<{
                         {app.status === "PENDING" && (
                           <Clock className="mr-1 h-3 w-3" />
                         )}
-                        {app.status}
+                        {app.status === "PENDING"
+                          ? "TERTUNDA"
+                          : app.status === "ACCEPTED"
+                            ? "DITERIMA"
+                            : app.status === "REJECTED"
+                              ? "DITOLAK"
+                              : app.status}
                       </Badge>
                     </div>
                   </CardHeader>
@@ -438,7 +460,7 @@ const WorkerProfile: FC<{
             {profile.reviewsReceived.length === 0 ? (
               <Card className="border-primary-200 bg-white shadow-sm">
                 <CardContent className="pt-6 text-center text-primary-600">
-                  <p>No reviews yet.</p>
+                  <p>Belum ada ulasan.</p>
                 </CardContent>
               </Card>
             ) : (
