@@ -46,7 +46,7 @@ export const Navbar = () => {
                 session.user.role === "WORKER") && (
                 <Link
                   href={
-                    session.user.role === "EMPLOYER" ? "/worker" : "/employer"
+                    session.user.role === "EMPLOYER" ? "/employer" : "/worker"
                   }
                   className={buttonVariants({
                     variant: "default",
@@ -135,7 +135,9 @@ export const Navbar = () => {
               (session.user.role === "EMPLOYER" ||
                 session.user.role === "WORKER") && (
                 <Link
-                  href={"/admin"}
+                  href={
+                    session.user.role === "EMPLOYER" ? "/employer" : "/worker"
+                  }
                   className={buttonVariants({
                     variant: "default",
                     className: "ml-6 w-full text-center",
