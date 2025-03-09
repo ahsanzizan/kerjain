@@ -8,17 +8,14 @@ import { motion } from "framer-motion";
 export const CTA = () => {
   return (
     <section className="flex items-center justify-center py-12 md:py-16">
-      <div className="relative w-full max-w-full rounded-xl bg-gradient-to-r from-blue-600 to-blue-400 p-8 text-center text-white md:p-12">
+      <div className="relative w-full max-w-full min-h-[350px] flex flex-col items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 to-blue-400 p-8 text-center text-white md:p-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <Text
-            variant="large3-semibold"
-            className="relative mb-4 text-xl font-semibold md:text-3xl"
-          >
+          <Text variant="large2-semibold" className="relative mb-4">
             Siap Bangun Jaringan Kerja Impianmu?
           </Text>
         </motion.div>
@@ -29,7 +26,7 @@ export const CTA = () => {
           transition={{ duration: 0.9, delay: 0.2, ease: "easeOut" }}
           viewport={{ once: true }}
         >
-          <Text className="relative mb-6 text-sm opacity-90 md:text-base">
+          <Text variant="title3" className="relative opacity-90">
             Temukan peluang kerja atau cari tenaga ahli dalam satu platform.
             Cepat, mudah, dan tanpa perantara.
           </Text>

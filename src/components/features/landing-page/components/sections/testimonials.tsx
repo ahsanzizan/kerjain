@@ -13,7 +13,7 @@ const testimonials = [
     image: "/copyrighted-images/testimoni-1.png",
     title: "Praktis & Fleksibel!",
     rating: 5,
-    text: "Sebagai ibu tunggal, saya butuh pekerjaan yang fleksibel agar tetap bisa mengurus anak-anak. Dengan Says, saya bisa bekerja dari rumah di waktu senggang dan tetap punya penghasilan. Prosesnya simpel, dan bayaran juga transparan. Sangat membantu! Sekarang saya nggak perlu khawatir soal pemasukan tambahan.",
+    text: "Sebagai ibu tunggal, saya butuh pekerjaan yang fleksibel agar tetap bisa mengurus anak-anak. Dengan Kerjain, saya bisa bekerja dari rumah di waktu senggang dan tetap punya penghasilan. Prosesnya simpel, dan bayaran juga transparan. Sangat membantu! Sekarang saya nggak perlu khawatir soal pemasukan tambahan.",
   },
   {
     name: "Andi Pratama",
@@ -21,7 +21,7 @@ const testimonials = [
     image: "/copyrighted-images/testimoni-2.png",
     title: "Cocok Buat Tambahan!",
     rating: 5,
-    text: "Kerjaan saya nggak menentu, jadi saya butuh pemasukan tambahan. Untungnya, Says punya banyak tugas kecil yang bisa saya ambil kapan aja. Nggak ribet dan langsung dibayar! Cocok banget buat yang butuh fleksibilitas tapi tetap ingin produktif.",
+    text: "Kerjaan saya nggak menentu, jadi saya butuh pemasukan tambahan. Untungnya, Kerjain punya banyak tugas kecil yang bisa saya ambil kapan aja. Nggak ribet dan langsung dibayar! Cocok banget buat yang butuh fleksibilitas tapi tetap ingin produktif.",
   },
   {
     name: "Rizki Aditya",
@@ -29,7 +29,7 @@ const testimonials = [
     image: "/copyrighted-images/testimoni-3.png",
     title: "Sangat Membantu Mahasiswa!",
     rating: 4,
-    text: "Sebagai mahasiswa, saya butuh penghasilan tambahan tanpa mengganggu kuliah. Dengan Says, saya bisa ambil pekerjaan fleksibel yang bisa dikerjakan kapan saja. Gajinya juga cepat masuk! Sekarang saya bisa lebih tenang soal biaya hidup dan tetap fokus belajar.",
+    text: "Sebagai mahasiswa, saya butuh penghasilan tambahan tanpa mengganggu kuliah. Dengan Kerjain, saya bisa ambil pekerjaan fleksibel yang bisa dikerjakan kapan saja. Gajinya juga cepat masuk! Sekarang saya bisa lebih tenang soal biaya hidup dan tetap fokus belajar.",
   },
 ];
 
@@ -45,7 +45,7 @@ export const Testimonials = () => {
 
   return (
     <section className="mx-auto mb-24 w-full py-16 md:px-8 lg:px-12">
-      <Text variant="large2-semibold" className="text-center text-gray-800">
+      <Text variant="large1-semibold" className="text-center">
         Testimoni Pengguna
       </Text>
       <div className="mt-12 flex flex-col-reverse gap-7 md:flex-row">
@@ -88,10 +88,7 @@ export const Testimonials = () => {
               transition={{ duration: 0.4 }}
               className="rounded-lg bg-white p-4 md:p-6"
             >
-              <Text
-                variant="title1-semibold"
-                className="text-lg text-gray-900 md:text-xl"
-              >
+              <Text variant="title1-semibold" className="text-gray-900">
                 {testimonials[activeIndex].title}
               </Text>
               <div className="mt-2 flex">
