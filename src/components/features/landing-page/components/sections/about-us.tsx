@@ -1,6 +1,7 @@
 import { Text } from "@/components/common/text";
 import { SectionTag } from "../common/section-tag";
 import { Check } from "lucide-react";
+import Image from "next/image";
 
 const ChecklistItem = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -23,8 +24,10 @@ export const AboutUs = () => {
     <section id="about-us" className="flex flex-col items-start pb-32 pt-32">
       <div className="flex w-full max-w-6xl flex-col gap-x-8 md:flex-row">
         <div className="flex-2 flex items-center justify-center p-4">
-          <img
+          <Image
             src="/illustrations/landing-page/about-us.png"
+            width={431}
+            height={467.85}
             alt="About Us Illustration"
             className="h-auto max-w-full"
           />
@@ -32,7 +35,7 @@ export const AboutUs = () => {
         <div className="flex-1 p-4 pt-20">
           <SectionTag>#TentangKami</SectionTag>
           <Text variant="large1-semibold" className="text-balance text-left">
-            Cari Kerja Mikro? Gampang Dapat!
+            Cari Kerja Mikro? Kerjain Aja!
           </Text>
           <div className="from-primary-50 mt-7 space-y-4">
             <ChecklistItem>
@@ -42,7 +45,7 @@ export const AboutUs = () => {
               Keistimewaan untuk membantu pekerja di daerah terpencil.
             </ChecklistItem>
             <ChecklistItem>
-              Akses informasi lowongan di seluruh Indonesia.
+              Akses informasi lowongan mikro di seluruh Indonesia.
             </ChecklistItem>
             <ChecklistItem>
               Fitur pencarian pekerjaan berbasis lokasi.
