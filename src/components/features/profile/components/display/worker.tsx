@@ -3,7 +3,7 @@
 import { PageContainer } from "@/components/layout/page-container";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -18,9 +18,11 @@ import {
   BriefcaseBusiness,
   CircleCheck,
   Clock,
+  LogOut,
   MapPin,
   Star,
 } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { type FC, useState } from "react";
 
@@ -68,6 +70,8 @@ const WorkerProfile: FC<{
   }>;
 }> = ({ profile }) => {
   const [activeTab, setActiveTab] = useState("overview");
+
+  const { data: session } = useSession();
 
   // Calculate average rating
   const averageRating =
@@ -504,6 +508,16 @@ const WorkerProfile: FC<{
             )}
           </TabsContent>
         </Tabs>
+
+        {session?.user.id === profile.id && (
+          <Button
+            variant={"destructive"}
+            onClick={() => signOut()}
+            className="mt-8"
+          >
+            <LogOut /> Keluar
+          </Button>
+        )}
       </div>
     </PageContainer>
   );
