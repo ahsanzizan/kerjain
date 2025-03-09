@@ -1,3 +1,5 @@
+"use client";
+
 import { Text } from "@/components/common/text";
 import {
   IconArrowWaveRightUp,
@@ -9,6 +11,7 @@ import { GraduationCap } from "lucide-react";
 import Image from "next/image";
 import { BentoGrid, BentoGridItem } from "../common/bento-grid";
 import { SectionTag } from "../common/section-tag";
+import { motion } from "framer-motion";
 
 const items = [
   {
@@ -90,8 +93,13 @@ const items = [
 
 export const FeaturedCategories = () => {
   return (
-    <section id="featured-categories" className="py-28">
-      <div className="block">
+    <section id="featured-categories" className="py-24">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
         <SectionTag>#PekerjaanMikro</SectionTag>
         <Text variant="large1-semibold" className="text-balance">
           Kategori Pekerjaan Mikro Unggulan di Kerjain!
@@ -102,16 +110,26 @@ export const FeaturedCategories = () => {
           koneksi Anda dengan peluang terbaik sesuai keterampilan dan kebutuhan
           Anda.
         </Text>
-      </div>
+      </motion.div>
       <BentoGrid className="mx-auto mt-14">
         {items.map((item, i) => (
-          <BentoGridItem
+          <motion.div
             key={i}
-            title={item.title}
-            description={item.description}
-            header={item.header}
-            icon={item.icon}
-          />
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.6,
+              delay: i * 0.2,
+            }}
+            viewport={{ once: true }}
+          >
+            <BentoGridItem
+              title={item.title}
+              description={item.description}
+              header={item.header}
+              icon={item.icon}
+            />
+          </motion.div>
         ))}
       </BentoGrid>
     </section>
