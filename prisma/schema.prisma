@@ -84,16 +84,43 @@ model Gig {
     pay         Float
     deadline    DateTime
     status      GigStatus @default(OPEN)
-    category    String // Job category (e.g., "Delivery", "Programming", etc.)
+    category    String
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
     // Relationships
     employerId   String
-    employer     User          @relation("PostedGigs", fields: [employerId], references: [id])
+    employer     User           @relation("PostedGigs", fields: [employerId], references: [id])
     applications Application[]
     reviews      Review[]
+    milestones   Milestone[]
+    completion   GigCompletion?
+}
+
+model Milestone {
+    id        String          @id @default(cuid())
+    gigId     String
+    gig       Gig             @relation(fields: [gigId], references: [id])
+    title     String
+    status    MilestoneStatus @default(PENDING) // PENDING, COMPLETED
+    createdAt DateTime        @default(now())
+
+    // Worker confirming completion of milestone
+    completedByWorker Boolean @default(false)
+}
+
+enum MilestoneStatus {
+    PENDING
+    COMPLETED
+}
+
+model GigCompletion {
+    id                  String    @id @default(cuid())
+    gigId               String    @unique
+    gig                 Gig       @relation(fields: [gigId], references: [id])
+    confirmedByEmployer Boolean   @default(false) // Employer confirmation
+    completedAt         DateTime? // When the employer confirms completion
 }
 
 model Application {
