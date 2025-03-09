@@ -84,7 +84,7 @@ model Gig {
     pay         Float
     deadline    DateTime
     status      GigStatus @default(OPEN)
-    category    String
+    categories  String[]  @map("category")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
