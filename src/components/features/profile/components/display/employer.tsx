@@ -31,7 +31,7 @@ const EmployerProfile: FC<{
           id: true;
           title: true;
           description: true;
-          category: true;
+          categories: true;
           pay: true;
           status: true;
           applications: {
@@ -276,7 +276,8 @@ const EmployerProfile: FC<{
                           variant="outline"
                           className="border-primary-300 text-primary-700"
                         >
-                          {gig.category}
+                          {/* eslint-disable-next-line @typescript-eslint/no-unsafe-call */}
+                          {gig.categories.join(", ")}
                         </Badge>
                         <span className="text-sm font-medium text-primary-700">
                           ${gig.pay}
@@ -310,7 +311,8 @@ const EmployerProfile: FC<{
                           {gig.title}
                         </CardTitle>
                         <CardDescription className="text-primary-600/80">
-                          {gig.category}
+                          {/* eslint-disable-next-line @typescript-eslint/no-unsafe-call */}
+                          {gig.categories.join(", ")}
                         </CardDescription>
                       </div>
                       <Badge className="bg-primary-600">

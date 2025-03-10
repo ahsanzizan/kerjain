@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Text } from "@/components/common/text";
+import { AnimatePresence, motion } from "framer-motion";
 import { Star } from "lucide-react";
 import Image from "next/image";
-import { Text } from "@/components/common/text";
+import { useEffect, useMemo, useState } from "react";
 
 const testimonials = [
   {
@@ -43,6 +43,11 @@ export const Testimonials = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const activeTestimony = useMemo(
+    () => testimonials[activeIndex],
+    [activeIndex],
+  );
+
   return (
     <section className="mx-auto mb-24 w-full py-16 md:px-8 lg:px-12">
       <Text variant="large1-semibold" className="text-center">
@@ -80,33 +85,36 @@ export const Testimonials = () => {
         </div>
         <div className="flex-1 overflow-hidden">
           <AnimatePresence mode="wait">
-            <motion.div
-              key={activeIndex}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.4 }}
-              className="rounded-lg bg-white p-4 md:p-6"
-            >
-              <Text variant="title1-semibold" className="text-gray-900">
-                {testimonials[activeIndex].title}
-              </Text>
-              <div className="mt-2 flex">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`h-5 w-5 md:h-6 md:w-6 ${
-                      i < testimonials[activeIndex].rating
-                        ? "text-yellow-500"
-                        : "text-gray-300"
-                    }`}
-                  />
-                ))}
-              </div>
-              <Text className="mt-4 text-gray-700">
-                {testimonials[activeIndex].text}
-              </Text>
-            </motion.div>
+            {activeTestimony && (
+              <motion.div
+                key={activeIndex}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.4 }}
+                className="rounded-lg bg-white p-4 md:p-6"
+              >
+                <Text variant="title1-semibold" className="text-gray-900">
+                  {activeTestimony.title}
+                </Text>
+                <div className="mt-2 flex">
+                  {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`h-5 w-5 md:h-6 md:w-6 ${
+                        i < activeTestimony.rating
+                          ? "text-yellow-500"
+                          : "text-gray-300"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <Text className="mt-4 text-gray-700">
+                  {activeTestimony.text}
+                </Text>
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
       </div>
