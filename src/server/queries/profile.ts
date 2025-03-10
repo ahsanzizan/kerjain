@@ -14,7 +14,7 @@ export const getEmployerProfile = async (userId: string) => {
           id: true,
           title: true,
           description: true,
-          category: true,
+          categories: true,
           pay: true,
           status: true,
           applications: {
@@ -67,7 +67,7 @@ export const getWorkerProfile = async (userId: string) => {
             select: {
               id: true,
               title: true,
-              category: true,
+              categories: true,
               employer: {
                 select: { id: true, name: true, email: true },
               },

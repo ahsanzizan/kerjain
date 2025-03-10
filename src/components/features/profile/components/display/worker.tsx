@@ -46,7 +46,7 @@ const WorkerProfile: FC<{
             select: {
               id: true;
               title: true;
-              category: true;
+              categories: true;
               employer: {
                 select: { id: true; name: true; email: true };
               };
@@ -99,7 +99,11 @@ const WorkerProfile: FC<{
       <div className="bg-primary-50/30 container mx-auto max-w-6xl p-8">
         <Link
           href="/worker"
-          className={buttonVariants({ variant: "default", className: "mb-8" })}
+          className={buttonVariants({
+            variant: "link",
+            size: "link",
+            className: "mb-8",
+          })}
         >
           <ArrowLeft /> Kembali
         </Link>
@@ -295,7 +299,8 @@ const WorkerProfile: FC<{
                           variant="outline"
                           className="border-primary-300 text-primary-700"
                         >
-                          {app.gig.category}
+                          {/* eslint-disable-next-line @typescript-eslint/no-unsafe-call */}
+                          {app.gig.categories.join(", ")}
                         </Badge>
                       </div>
                     </div>
@@ -413,7 +418,8 @@ const WorkerProfile: FC<{
                           {app.gig.title}
                         </CardTitle>
                         <CardDescription className="text-primary-600/80">
-                          {app.gig.category}
+                          {/* eslint-disable-next-line @typescript-eslint/no-unsafe-call */}
+                          {app.gig.categories.join(", ")}
                         </CardDescription>
                       </div>
                       <Badge

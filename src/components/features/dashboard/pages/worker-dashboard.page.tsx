@@ -5,7 +5,6 @@ import { formatRupiah } from "@/lib/utils";
 import { auth } from "@/server/auth";
 import { getWorkerDashboard } from "@/server/queries/worker-dashboard";
 import {
-  Activity,
   Briefcase,
   CheckCircle,
   Clock,
@@ -17,6 +16,7 @@ import {
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { WorkerCharts } from "../components/worker-charts";
+import { buttonVariants } from "@/components/ui/button";
 
 export const WorkerDashboard = async () => {
   const session = await auth();
@@ -147,7 +147,7 @@ export const WorkerDashboard = async () => {
               <div className="grid grid-cols-2 gap-2 md:grid-cols-1">
                 <Link
                   href="/worker/gigs"
-                  className="block rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white transition-all hover:shadow-md"
+                  className={buttonVariants({ size: "sm" })}
                 >
                   <div className="flex items-center p-2">
                     <Search className="mr-2 h-4 w-4" />
@@ -157,33 +157,14 @@ export const WorkerDashboard = async () => {
 
                 <Link
                   href="/worker/applications"
-                  className="block rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 text-white transition-all hover:shadow-md"
+                  className={buttonVariants({
+                    variant: "secondary",
+                    size: "sm",
+                  })}
                 >
                   <div className="flex items-center p-2">
                     <FileText className="mr-2 h-4 w-4" />
                     <span className="text-sm font-medium">Kelola Lamaran</span>
-                  </div>
-                </Link>
-
-                <Link
-                  href="/worker/ongoing"
-                  className="block rounded-lg bg-gradient-to-r from-yellow-500 to-yellow-600 text-white transition-all hover:shadow-md"
-                >
-                  <div className="flex items-center p-2">
-                    <Activity className="mr-2 h-4 w-4" />
-                    <span className="text-sm font-medium">
-                      Pekerjaan Berlangsung
-                    </span>
-                  </div>
-                </Link>
-
-                <Link
-                  href="/worker/completed"
-                  className="block rounded-lg bg-gradient-to-r from-green-500 to-green-600 text-white transition-all hover:shadow-md"
-                >
-                  <div className="flex items-center p-2">
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    <span className="text-sm font-medium">Pekerjaan </span>
                   </div>
                 </Link>
               </div>

@@ -91,7 +91,11 @@ const EmployerProfile: FC<{
       <div className="bg-primary-50/30 container mx-auto max-w-6xl p-8">
         <Link
           href="/employer"
-          className={buttonVariants({ variant: "default", className: "mb-8" })}
+          className={buttonVariants({
+            variant: "link",
+            size: "link",
+            className: "mb-8",
+          })}
         >
           <ArrowLeft /> Kembali
         </Link>

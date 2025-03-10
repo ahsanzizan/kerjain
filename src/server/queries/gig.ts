@@ -1,5 +1,7 @@
+"use server";
+
 import { db } from "@/server/db";
-import { Prisma } from "@prisma/client";
+import { type Gig, Prisma } from "@prisma/client";
 import { z } from "zod";
 
 const schema = z.object({
@@ -64,7 +66,6 @@ const buildPrismaFilters = (input: {
  * @param {"pay"|"deadline"|"distance"} [input.sortBy] - Sorting criteria.
  * @param {"asc"|"desc"} [input.sortOrder="asc"] - Sorting order (ascending or descending).
  * @param {{ latitude: number; longitude: number }} [input.userLocation] - User location for distance-based sorting.
- * @returns {Promise<{ gigs: Object[], totalGigs: number, totalPages: number, currentPage: number }>} The paginated gigs data.
  */
 export const getPaginatedGigs = async (input: {
   page?: number;
@@ -104,18 +105,7 @@ export const getPaginatedGigs = async (input: {
   try {
     if (sortBy === "distance" && userLocation) {
       // Use raw SQL query for distance calculation
-      const gigs = await db.$queryRaw<
-        {
-          id: string;
-          title: string;
-          description: string;
-          pay: number;
-          deadline: Date;
-          latitude: number;
-          longitude: number;
-          distance: number;
-        }[]
-      >`
+      const gigs = await db.$queryRaw<Gig[]>`
         SELECT *,
           (6371 * acos(
             cos(radians(${userLocation.latitude})) * 
@@ -139,7 +129,6 @@ export const getPaginatedGigs = async (input: {
         currentPage: page,
       };
     } else {
-      // Standard Prisma sorting
       let orderBy: Prisma.GigOrderByWithRelationInput = {
         createdAt: sortOrder,
       };
@@ -182,11 +171,11 @@ export const evaluateGigPay = async (input: {
   const { category, pay } = input;
 
   const similarGigs = await db.gig.findMany({
-    where: { category },
+    where: { categories: { has: category } },
     select: { pay: true },
   });
 
-  if (similarGigs.length < 2) return "No data available";
+  if (similarGigs.length < 2) return null;
 
   // Extract pay values
   const payValues = similarGigs.map((gig) => gig.pay).sort((a, b) => a - b);
@@ -200,4 +189,13 @@ export const evaluateGigPay = async (input: {
   if (pay < medianPay * 0.8) return "Low"; // Less than 80% of median
   if (pay > medianPay * 1.2) return "Generous"; // More than 120% of median
   return "Fair"; // Within the 80%-120% range
+};
+
+export const getGigCategories = async () => {
+  const gigs = await db.gig.findMany({ select: { categories: true } });
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  const categories = gigs.map((gig) => gig.categories);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return categories.flat();
 };

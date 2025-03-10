@@ -13,3 +13,11 @@ export const formatRupiah = (n: number) => {
     maximumFractionDigits: 0,
   }).format(n);
 };
+
+export const formatDate = (date: Date): string => {
+  return new Intl.DateTimeFormat("id-ID", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(new Date(date));
+};
