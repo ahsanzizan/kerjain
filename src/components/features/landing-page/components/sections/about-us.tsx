@@ -1,9 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Text } from "@/components/common/text";
-import { SectionTag } from "../common/section-tag";
+import { motion } from "framer-motion";
 import { Check } from "lucide-react";
+import Image from "next/image";
+import { SectionTag } from "../common/section-tag";
 
 const listVariants = {
   hidden: { opacity: 0 },
@@ -53,7 +54,7 @@ export const AboutUs = () => {
           viewport={{ once: true }}
           className="flex-2 flex items-center justify-center p-4"
         >
-          <img
+          <Image
             src="/illustrations/landing-page/about-us.png"
             width={431}
             height={467.85}
