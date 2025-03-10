@@ -1,5 +1,7 @@
 "use client";
 
+import { Text } from "@/components/common/text";
+import { PageContainer } from "@/components/layout/page-container";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getAddressByLatLong } from "@/services/get-address-by-latlong";
 import { type Gig } from "@prisma/client";
 import {
   ArrowLeft,
@@ -21,7 +24,7 @@ import {
   Search,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GigCard } from "../components/gig-card";
 import { GigCardSkeleton } from "../components/gig-card-skeleton";
 import { type SortByOption, type SortOrderOption } from "../types";
@@ -54,6 +57,7 @@ export const FindGigsPage: React.FC<{
 
   // Local state for location management
   const [isLoadingLocation, setIsLoadingLocation] = useState<boolean>(false);
+  const [address, setAddress] = useState<string>();
   const [locationEnabled, setLocationEnabled] = useState<boolean>(
     Boolean(latitude && longitude),
   );
@@ -63,6 +67,18 @@ export const FindGigsPage: React.FC<{
   const perPage = parseInt(getParamValue("perPage", "12"));
   const sortBy = getParamValue("sortBy", "deadline") as SortByOption;
   const sortOrder = getParamValue("sortOrder", "asc") as SortOrderOption;
+
+  useEffect(() => {
+    if (locationEnabled) {
+      getAddressByLatLong(latitude!, longitude!)
+        .then((v) =>
+          v !== null
+            ? setAddress(v)
+            : console.error("Failed to retrieve address by lat & long."),
+        )
+        .catch((e) => console.error(e));
+    }
+  }, [locationEnabled, latitude, longitude]);
 
   const updateUserLocation = (): void => {
     if (navigator.geolocation) {
@@ -149,7 +165,7 @@ export const FindGigsPage: React.FC<{
   };
 
   const handleViewDetails = (gigId: string): void => {
-    router.push(`/gigs/${gigId}`);
+    router.push(`/worker/gigs/${gigId}`);
   };
 
   const clearAllFilters = (): void => {
@@ -166,7 +182,7 @@ export const FindGigsPage: React.FC<{
     }
 
     router.push(
-      `/gigs/find${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ""}`,
+      `/worker/gigs${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ""}`,
     );
   };
 
@@ -221,258 +237,271 @@ export const FindGigsPage: React.FC<{
   };
 
   return (
-    <div className="mx-auto max-w-6xl p-4">
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <Button
-          variant="ghost"
-          className="flex items-center gap-2"
-          onClick={() => router.push("/worker")}
-        >
-          <ArrowLeft size={18} />
-          Kembali ke Dashboard
-        </Button>
-        <Button
-          variant={locationEnabled ? "outline" : "default"}
-          className={
-            locationEnabled
-              ? "gap-2 bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700"
-              : "gap-2"
-          }
-          onClick={updateUserLocation}
-          disabled={isLoadingLocation}
-        >
-          {isLoadingLocation ? (
-            <RefreshCw className="animate-spin" size={18} />
-          ) : (
-            <MapPin size={18} />
-          )}
-          {locationEnabled ? "Perbarui Lokasi" : "Dapatkan Lokasi"}
-        </Button>
-      </div>
+    <PageContainer withFooter>
+      <div className="mx-auto max-w-6xl p-4">
+        {/* Header */}
+        <div className="mb-6 flex items-center justify-between">
+          <Button
+            variant="ghost"
+            className="flex items-center gap-2"
+            onClick={() => router.push("/worker")}
+          >
+            <ArrowLeft size={18} />
+            Kembali
+          </Button>
+          <Button
+            variant={locationEnabled ? "outline" : "default"}
+            className={
+              locationEnabled
+                ? "gap-2 bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700"
+                : "gap-2"
+            }
+            onClick={updateUserLocation}
+            disabled={isLoadingLocation}
+          >
+            {isLoadingLocation ? (
+              <RefreshCw className="animate-spin" size={18} />
+            ) : (
+              <MapPin size={18} />
+            )}
+            Perbarui Lokasi
+          </Button>
+        </div>
 
-      <h1 className="mb-6 text-3xl font-bold">Temukan Gigs</h1>
+        <h1 className="text-3xl font-bold">Temukan Gigs</h1>
+        <Text variant="callout" className="mb-6">
+          Area: {address}
+        </Text>
 
-      {/* Filter section */}
-      <Card className="mb-6">
-        <CardHeader className="pb-2">
-          <CardTitle>Filter Pencarian</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSearch}>
-            {/* Search bar */}
-            <div className="mb-6 flex gap-2">
-              <div className="relative flex-grow">
-                <Search
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                  size={18}
-                />
-                <Input
-                  type="text"
-                  className="pl-10"
-                  placeholder="Cari gigs..."
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                />
+        {/* Filter section */}
+        <Card className="mb-6">
+          <CardHeader className="pb-2">
+            <CardTitle>Filter Pencarian</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSearch}>
+              {/* Search bar */}
+              <div className="mb-6 flex gap-2">
+                <div className="relative flex-grow">
+                  <Search
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    size={18}
+                  />
+                  <Input
+                    type="text"
+                    className="pl-10"
+                    placeholder="Cari gigs..."
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                </div>
+                <Button type="submit">Cari</Button>
               </div>
-              <Button type="submit">Cari</Button>
-            </div>
 
-            {/* Filters grid */}
-            <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {/* Category filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Kategori</label>
-                <Select value={categoryInput} onValueChange={setCategoryInput}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Semua Kategori" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ALL">Semua Kategori</SelectItem>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
-                        {cat}
+              {/* Filters grid */}
+              <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                {/* Category filter */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Kategori</label>
+                  <Select
+                    value={categoryInput}
+                    onValueChange={setCategoryInput}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Semua Kategori" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ALL">Semua Kategori</SelectItem>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat} value={cat}>
+                          {cat}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Min pay filter */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Gaji Minimum (Rp)
+                  </label>
+                  <Input
+                    type="number"
+                    placeholder="Contoh: 50000"
+                    value={minPayInput}
+                    onChange={(e) => setMinPayInput(e.target.value)}
+                  />
+                </div>
+
+                {/* Max pay filter */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Gaji Maksimum (Rp)
+                  </label>
+                  <Input
+                    type="number"
+                    placeholder="Contoh: 500000"
+                    value={maxPayInput}
+                    onChange={(e) => setMaxPayInput(e.target.value)}
+                  />
+                </div>
+
+                {/* Sort by filter */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Urutkan Berdasarkan
+                  </label>
+                  <Select value={sortBy} onValueChange={handleSortByChange}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pay">Gaji</SelectItem>
+                      <SelectItem value="deadline">Tenggat Waktu</SelectItem>
+                      {locationEnabled && (
+                        <SelectItem value="distance">Jarak</SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Sort order filter */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Urutan</label>
+                  <Select
+                    value={sortOrder}
+                    onValueChange={handleSortOrderChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="asc">
+                        Naik (
+                        {sortBy === "pay"
+                          ? "Terendah ke Tertinggi"
+                          : sortBy === "deadline"
+                            ? "Terdekat ke Terjauh"
+                            : "Terdekat ke Terjauh"}
+                        )
                       </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                      <SelectItem value="desc">
+                        Turun (
+                        {sortBy === "pay"
+                          ? "Tertinggi ke Terendah"
+                          : sortBy === "deadline"
+                            ? "Terjauh ke Terdekat"
+                            : "Terjauh ke Terdekat"}
+                        )
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Per page filter */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Tampilkan per halaman
+                  </label>
+                  <Select
+                    value={perPage.toString()}
+                    onValueChange={handlePerPageChange}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="12">12</SelectItem>
+                      <SelectItem value="24">24</SelectItem>
+                      <SelectItem value="36">36</SelectItem>
+                      <SelectItem value="48">48</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
-              {/* Min pay filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Gaji Minimum (Rp)</label>
-                <Input
-                  type="number"
-                  placeholder="Contoh: 50000"
-                  value={minPayInput}
-                  onChange={(e) => setMinPayInput(e.target.value)}
-                />
-              </div>
-
-              {/* Max pay filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Gaji Maksimum (Rp)
-                </label>
-                <Input
-                  type="number"
-                  placeholder="Contoh: 500000"
-                  value={maxPayInput}
-                  onChange={(e) => setMaxPayInput(e.target.value)}
-                />
-              </div>
-
-              {/* Sort by filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Urutkan Berdasarkan
-                </label>
-                <Select value={sortBy} onValueChange={handleSortByChange}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pay">Gaji</SelectItem>
-                    <SelectItem value="deadline">Tenggat Waktu</SelectItem>
-                    {locationEnabled && (
-                      <SelectItem value="distance">Jarak</SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Sort order filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Urutan</label>
-                <Select value={sortOrder} onValueChange={handleSortOrderChange}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="asc">
-                      Naik (
-                      {sortBy === "pay"
-                        ? "Terendah ke Tertinggi"
-                        : sortBy === "deadline"
-                          ? "Terdekat ke Terjauh"
-                          : "Terdekat ke Terjauh"}
-                      )
-                    </SelectItem>
-                    <SelectItem value="desc">
-                      Turun (
-                      {sortBy === "pay"
-                        ? "Tertinggi ke Terendah"
-                        : sortBy === "deadline"
-                          ? "Terjauh ke Terdekat"
-                          : "Terjauh ke Terdekat"}
-                      )
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Per page filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Tampilkan per halaman
-                </label>
-                <Select
-                  value={perPage.toString()}
-                  onValueChange={handlePerPageChange}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="12">12</SelectItem>
-                    <SelectItem value="24">24</SelectItem>
-                    <SelectItem value="36">36</SelectItem>
-                    <SelectItem value="48">48</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="flex justify-between">
-              {hasActiveFilters && (
+              <div className="flex justify-between">
+                {hasActiveFilters && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={clearAllFilters}
+                  >
+                    Hapus Semua Filter
+                  </Button>
+                )}
                 <Button
-                  type="button"
-                  variant="outline"
-                  onClick={clearAllFilters}
+                  type="submit"
+                  className={hasActiveFilters ? "" : "w-full sm:w-auto"}
                 >
-                  Hapus Semua Filter
+                  Terapkan Filter
                 </Button>
-              )}
-              <Button
-                type="submit"
-                className={hasActiveFilters ? "" : "w-full sm:w-auto"}
-              >
-                Terapkan Filter
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
 
-      {/* Results */}
-      <div className="mb-6">
-        <h2 className="mb-4 text-xl font-semibold">Hasil Pencarian</h2>
+        {/* Results */}
+        <div className="mb-6">
+          <h2 className="mb-4 text-xl font-semibold">Hasil Pencarian</h2>
 
-        {isLoadingLocation ? (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {Array(6)
-              .fill(0)
-              .map((_, i) => (
-                <GigCardSkeleton key={i} />
-              ))}
-          </div>
-        ) : gigs.length === 0 ? (
-          renderNoGigsMessage()
-        ) : (
-          <>
+          {isLoadingLocation ? (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {gigs.map((gig) => (
-                <GigCard
-                  key={gig.id}
-                  gig={gig}
-                  onViewDetails={handleViewDetails}
-                />
-              ))}
+              {Array(6)
+                .fill(0)
+                .map((_, i) => (
+                  <GigCardSkeleton key={i} />
+                ))}
             </div>
-
-            {/* Pagination */}
-            <div className="mt-6 flex items-center justify-between">
-              <p className="text-sm text-gray-500">
-                Menampilkan {Math.min(totalGigs, (page - 1) * perPage + 1)} -{" "}
-                {Math.min(page * perPage, totalGigs)} dari {totalGigs} gigs
-              </p>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={page === 1}
-                  onClick={() => handlePageChange(page - 1)}
-                >
-                  <ChevronLeft size={16} className="mr-1" />
-                  Sebelumnya
-                </Button>
-                <span className="text-sm">
-                  {page} / {totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={page === totalPages}
-                  onClick={() => handlePageChange(page + 1)}
-                >
-                  Berikutnya
-                  <ChevronRight size={16} className="ml-1" />
-                </Button>
+          ) : gigs.length === 0 ? (
+            renderNoGigsMessage()
+          ) : (
+            <>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {gigs.map((gig) => (
+                  <GigCard
+                    key={gig.id}
+                    gig={gig}
+                    onViewDetails={handleViewDetails}
+                  />
+                ))}
               </div>
-            </div>
-          </>
-        )}
+
+              {/* Pagination */}
+              <div className="mt-6 flex items-center justify-between">
+                <p className="text-sm text-gray-500">
+                  Menampilkan {Math.min(totalGigs, (page - 1) * perPage + 1)} -{" "}
+                  {Math.min(page * perPage, totalGigs)} dari {totalGigs} gigs
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={page === 1}
+                    onClick={() => handlePageChange(page - 1)}
+                  >
+                    <ChevronLeft size={16} className="mr-1" />
+                    Sebelumnya
+                  </Button>
+                  <span className="text-sm">
+                    {page} / {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={page === totalPages}
+                    onClick={() => handlePageChange(page + 1)}
+                  >
+                    Berikutnya
+                    <ChevronRight size={16} className="ml-1" />
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </PageContainer>
   );
 };
