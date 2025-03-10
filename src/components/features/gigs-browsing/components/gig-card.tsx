@@ -13,33 +13,43 @@ import { calculateDistanceInKm, formatDate, formatRupiah } from "@/lib/utils";
 import { getAddressByLatLong } from "@/services/get-address-by-latlong";
 import { type GigStatus } from "@prisma/client";
 import { Calendar, DollarSign, LocateIcon, Tag } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { type GigCardProps } from "../types";
 
-export const GigCard: React.FC<GigCardProps> = ({ gig, onViewDetails }) => {
-  const searchParams = useSearchParams();
+export const GigCard: React.FC<GigCardProps> = ({
+  gig,
+  onViewDetails,
+  userLat,
+  userLong,
+}) => {
+  const [address, setAddress] = useState<string | null>(null);
+  const [loadingAddress, setLoadingAddress] = useState<boolean>(true);
 
-  const userLat = searchParams.get("lat");
-  const userLong = searchParams.get("lng");
-
-  const distanceInKm = useMemo(() => {
-    return calculateDistanceInKm(
-      { lat: gig.latitude, lng: gig.longitude },
-      { lat: Number(userLat), lng: Number(userLong) },
-    );
-  }, [gig.latitude, gig.longitude, userLat, userLong]);
-
-  const [address, setAddress] = useState<string>();
+  const distanceInKm = useMemo(
+    () =>
+      userLat && userLong
+        ? calculateDistanceInKm(
+            { lat: gig.latitude, lng: gig.longitude },
+            { lat: Number(userLat), lng: Number(userLong) },
+          )
+        : null,
+    [gig.latitude, gig.longitude, userLat, userLong],
+  );
 
   useEffect(() => {
-    getAddressByLatLong(gig.latitude, gig.longitude)
-      .then((v) =>
-        v !== null
-          ? setAddress(v)
-          : console.error("Failed to retrieve address by lat & long."),
-      )
-      .catch((e) => console.error(e));
+    async function fetchAddress() {
+      if (!gig.latitude || !gig.longitude) return;
+      try {
+        const result = await getAddressByLatLong(gig.latitude, gig.longitude);
+        setAddress(result);
+      } catch (error) {
+        console.error("Error fetching address:", error);
+        setAddress(null);
+      } finally {
+        setLoadingAddress(false);
+      }
+    }
+    fetchAddress().catch((e) => console.error(e));
   }, [gig.latitude, gig.longitude]);
 
   const getStatusBadgeVariant = (
@@ -75,7 +85,10 @@ export const GigCard: React.FC<GigCardProps> = ({ gig, onViewDetails }) => {
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
           <CardTitle className="text-lg">{gig.title}</CardTitle>
-          <Badge variant={getStatusBadgeVariant(gig.status)}>
+          <Badge
+            variant={getStatusBadgeVariant(gig.status)}
+            className="bg-green-500 hover:bg-green-700"
+          >
             {getStatusLabel(gig.status)}
           </Badge>
         </div>
@@ -96,12 +109,19 @@ export const GigCard: React.FC<GigCardProps> = ({ gig, onViewDetails }) => {
             </span>
           </div>
 
-          <div className="flex items-center justify-between">
-            <LocateIcon className="text-gray-400" size={16} />
-            <span className="w-[90%] text-sm">
-              Lokasi: {address} ({distanceInKm} KM)
-            </span>
-          </div>
+          {loadingAddress ? (
+            <div className="flex items-center justify-between">
+              <LocateIcon className="text-gray-400" size={16} />
+              <span className="w-[90%] text-sm">Mengambil alamat...</span>
+            </div>
+          ) : address && distanceInKm ? (
+            <div className="flex items-center justify-between">
+              <LocateIcon className="text-gray-400" size={16} />
+              <span className="w-[90%] text-sm">
+                Lokasi: {address} ({distanceInKm} KM)
+              </span>
+            </div>
+          ) : null}
 
           <div className="flex items-center justify-between">
             <Tag className="text-gray-400" size={16} />

@@ -2,7 +2,7 @@
 
 import { Text } from "@/components/common/text";
 import { PageContainer } from "@/components/layout/page-container";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -23,6 +23,7 @@ import {
   RefreshCw,
   Search,
 } from "lucide-react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { GigCard } from "../components/gig-card";
@@ -199,13 +200,15 @@ export const FindGigsPage: React.FC<{
                 Saat ini belum ada gigs yang tersedia di platform. Silakan cek
                 kembali nanti untuk menemukan pekerjaan baru.
               </p>
-              <Button
-                variant="ghost"
-                className="mt-6"
-                onClick={() => router.push("/worker")}
+              <Link
+                href={"/worker"}
+                className={buttonVariants({
+                  variant: "ghost",
+                  className: "mt-6",
+                })}
               >
                 Kembali ke Dashboard
-              </Button>
+              </Link>
             </CardContent>
           </Card>
         );
@@ -241,14 +244,16 @@ export const FindGigsPage: React.FC<{
       <div className="mx-auto max-w-6xl p-4">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
-          <Button
-            variant="ghost"
-            className="flex items-center gap-2"
-            onClick={() => router.push("/worker")}
+          <Link
+            href={"/worker"}
+            className={buttonVariants({
+              variant: "ghost",
+              className: "flex items-center gap-2",
+            })}
           >
             <ArrowLeft size={18} />
             Kembali
-          </Button>
+          </Link>
           <Button
             variant={locationEnabled ? "outline" : "default"}
             className={
@@ -268,10 +273,10 @@ export const FindGigsPage: React.FC<{
           </Button>
         </div>
 
-        <h1 className="text-3xl font-bold">Temukan Gigs</h1>
-        <Text variant="callout" className="mb-6">
-          Area: {address}
-        </Text>
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold">Temukan Gigs</h1>
+          {address && <Text variant="callout">{address}</Text>}
+        </div>
 
         {/* Filter section */}
         <Card className="mb-6">
@@ -464,6 +469,8 @@ export const FindGigsPage: React.FC<{
                     key={gig.id}
                     gig={gig}
                     onViewDetails={handleViewDetails}
+                    userLat={latitude}
+                    userLong={longitude}
                   />
                 ))}
               </div>

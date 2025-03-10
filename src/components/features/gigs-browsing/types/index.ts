@@ -8,6 +8,8 @@ export interface Location {
 export interface GigCardProps {
   gig: Gig;
   onViewDetails: (id: string) => void;
+  userLat: number | null;
+  userLong?: number | null;
 }
 
 export type GigStatus = "OPEN" | "IN_PROGRESS" | "COMPLETED";
