@@ -1,11 +1,29 @@
+"use client";
+
+import { motion } from "framer-motion";
 import { Text } from "@/components/common/text";
 import { SectionTag } from "../common/section-tag";
 import { Check } from "lucide-react";
-import Image from "next/image";
+
+const listVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.2 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: -20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+};
 
 const ChecklistItem = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="group flex items-start gap-3">
+    <motion.div
+      variants={itemVariants}
+      className="group flex items-start gap-3"
+    >
       <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary-500 transition-all duration-300 group-hover:bg-primary-600 group-hover:shadow-lg">
         <Check className="size-4 text-white transition-transform duration-300 group-hover:scale-110" />
       </div>
@@ -15,29 +33,52 @@ const ChecklistItem = ({ children }: { children: React.ReactNode }) => {
       >
         {children}
       </Text>
-    </div>
+    </motion.div>
   );
 };
 
 export const AboutUs = () => {
   return (
-    <section id="about-us" className="flex flex-col items-start pb-32 pt-32">
-      <div className="flex w-full max-w-6xl flex-col gap-x-8 md:flex-row">
-        <div className="flex-2 flex items-center justify-center p-4">
-          <Image
+    <section id="about-us" className="flex flex-col items-start py-20">
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="flex w-full flex-col gap-x-8 md:flex-row"
+      >
+        <motion.div
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          viewport={{ once: true }}
+          className="flex-2 flex items-center justify-center p-4"
+        >
+          <img
             src="/illustrations/landing-page/about-us.png"
             width={431}
             height={467.85}
             alt="About Us Illustration"
             className="h-auto max-w-full"
           />
-        </div>
-        <div className="flex-1 p-4 pt-20">
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          viewport={{ once: true }}
+          className="flex-1 p-4 pt-20"
+        >
           <SectionTag>#TentangKami</SectionTag>
           <Text variant="large1-semibold" className="text-balance text-left">
             Cari Kerja Mikro? Kerjain Aja!
           </Text>
-          <div className="from-primary-50 mt-7 space-y-4">
+          <motion.div
+            variants={listVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="from-primary-50 mt-7 space-y-4"
+          >
             <ChecklistItem>
               Semua bisa mendapatkan kesempatan yang lebih baik.
             </ChecklistItem>
@@ -53,9 +94,9 @@ export const AboutUs = () => {
             <ChecklistItem>
               Koneksi langsung antara pekerja dan penyedia jasa.
             </ChecklistItem>
-          </div>
-        </div>
-      </div>
+          </motion.div>
+        </motion.div>
+      </motion.div>
     </section>
   );
 };
