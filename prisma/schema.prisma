@@ -81,6 +81,7 @@ model Gig {
     description String
     latitude    Float
     longitude   Float
+    address     String    @default("")
     pay         Float
     deadline    DateTime
     status      GigStatus @default(OPEN)

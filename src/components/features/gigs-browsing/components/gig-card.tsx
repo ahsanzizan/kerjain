@@ -10,10 +10,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { calculateDistanceInKm, formatDate, formatRupiah } from "@/lib/utils";
-import { getAddressByLatLong } from "@/services/get-address-by-latlong";
 import { type GigStatus } from "@prisma/client";
 import { Calendar, DollarSign, LocateIcon, Tag } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { type GigCardProps } from "../types";
 
 export const GigCard: React.FC<GigCardProps> = ({
@@ -22,9 +21,6 @@ export const GigCard: React.FC<GigCardProps> = ({
   userLat,
   userLong,
 }) => {
-  const [address, setAddress] = useState<string | null>(null);
-  const [loadingAddress, setLoadingAddress] = useState<boolean>(true);
-
   const distanceInKm = useMemo(
     () =>
       userLat && userLong
@@ -35,22 +31,6 @@ export const GigCard: React.FC<GigCardProps> = ({
         : null,
     [gig.latitude, gig.longitude, userLat, userLong],
   );
-
-  useEffect(() => {
-    async function fetchAddress() {
-      if (!gig.latitude || !gig.longitude) return;
-      try {
-        const result = await getAddressByLatLong(gig.latitude, gig.longitude);
-        setAddress(result);
-      } catch (error) {
-        console.error("Error fetching address:", error);
-        setAddress(null);
-      } finally {
-        setLoadingAddress(false);
-      }
-    }
-    fetchAddress().catch((e) => console.error(e));
-  }, [gig.latitude, gig.longitude]);
 
   const getStatusBadgeVariant = (
     status: GigStatus,
@@ -108,20 +88,12 @@ export const GigCard: React.FC<GigCardProps> = ({
               Tenggat: {formatDate(gig.deadline)}
             </span>
           </div>
-
-          {loadingAddress ? (
-            <div className="flex items-center justify-between">
-              <LocateIcon className="text-gray-400" size={16} />
-              <span className="w-[90%] text-sm">Mengambil alamat...</span>
-            </div>
-          ) : address && distanceInKm ? (
-            <div className="flex items-center justify-between">
-              <LocateIcon className="text-gray-400" size={16} />
-              <span className="w-[90%] text-sm">
-                Lokasi: {address} ({distanceInKm} KM)
-              </span>
-            </div>
-          ) : null}
+          <div className="flex items-center justify-between">
+            <LocateIcon className="text-gray-400" size={16} />
+            <span className="w-[90%] text-sm">
+              Lokasi: {gig.address} ({distanceInKm} KM)
+            </span>
+          </div>
 
           <div className="flex items-center justify-between">
             <Tag className="text-gray-400" size={16} />
