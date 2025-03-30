@@ -95,9 +95,10 @@ export async function getGigDetails(id: string) {
 export default async function GigDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const gig = await getGigDetails(params.id);
+  const { id } = await params;
+  const gig = await getGigDetails(id);
 
   if (!gig) {
     return notFound();

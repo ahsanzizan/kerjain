@@ -1,3 +1,5 @@
-export default function Page() {
-  return <></>;
-}
+import { EmployerDashboardPage } from "@/components/features/dashboard/pages/employer/employer-dashboard";
+
+const Page = EmployerDashboardPage;
+
+export default Page;
